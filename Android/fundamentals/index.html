@@ -1,0 +1,36 @@
+<!DOCTYPE html><html lang="zh-cn"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> Android基础（Android笔记一） · maohhgg</title><meta name="description" content="Android基础（Android笔记一） - maohhgg"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.ico"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="http://maohhgg.github.io/atom.xml" title="maohhgg"><meta name="generator" content="Hexo 4.0.0"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="/tags/" target="_self" class="nav-list-link">TAG</a></li><li class="nav-list-item"><a href="https://github.com/maohhgg" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">Android基础（Android笔记一）</h1><div class="post-tags"><a href="/tags/Android/">#Android</a></div><div class="post-info">2016年9月9日</div><div class="post-content"><h1 id="Android笔记"><a href="#Android笔记" class="headerlink" title="Android笔记"></a>Android笔记</h1><hr>
+<h2 id="基础知识"><a href="#基础知识" class="headerlink" title="基础知识"></a>基础知识</h2><h3 id="应用组件"><a href="#应用组件" class="headerlink" title="应用组件"></a>应用组件</h3><p>应用组件是 Android 应用的基本构建基块。每个组件都是一个不同的点，系统可以通过它进入您的应用。并非所有组件都是用户的实际入口点，有些组件相互依赖，但每个组件都以独立实体形式存在，并发挥特定作用–每个组件都是唯一的构建基块，有助于定义应用的总体行为。</p>
+<ul>
+<li>Activity</li>
+<li>服务（service）</li>
+<li>内容提供程序（ContentResolver）</li>
+<li>广播接收器（BroadcastRecevier）</li>
+</ul>
+<h3 id="启动组件"><a href="#启动组件" class="headerlink" title="启动组件"></a>启动组件</h3><p>四种组件类型中的三种–Activity、服务和广播接收器–通过名为 Intent 的异步消息进行启动。 Intent 会在运行时将各个组件相互绑定（您可以将 <code>Intent</code> 视为从其他组件请求操作的信使），无论组件属于您的应用还是其他应用。</p>
+<p>每种类型的组件有不同的启动方法：</p>
+<ul>
+<li>您可以通过将 <code>Intent</code> 传递到 <code>startActivity()</code> 或 <code>startActivityForResult()</code>（当您想让 <code>Activity</code> 返回结果时）来启动 Activity（或为其安排新任务）；</li>
+<li>您可以通过将 <code>Intent</code> 传递到 <code>startService()</code> 来启动服务（或对执行中的服务下达新指令）。或者，您也可以通过将 <code>Intent</code> 传递到 <code>bindService()</code> 来绑定到该服务；</li>
+<li>您可以通过将 <code>Intent</code> 传递到 <code>sendBroadcast()</code>、<code>sendOrderedBroadcast()</code> 或 <code>sendStickyBroadcast()</code> 等方法来发起广播；</li>
+<li>您可以通过在 <code>ContentResolver</code> 上调用 <code>query()</code> 来对内容提供程序执行查询。</li>
+</ul>
+<h3 id="清单文件"><a href="#清单文件" class="headerlink" title="清单文件"></a>清单文件</h3><p>在 Android 系统启动应用组件之前，系统必须通过读取应用的 <code>AndroidManifest.xml</code> 文件（”清单”文件）确认组件存在。您的应用必须在此文件中声明其所有组件，该文件必须位于应用项目目录的根目录中。</p>
+<ul>
+<li><strong>确定应用需要的任何用户权限，如互联网访问权限或对用户联系人的读取权限</strong></li>
+<li>根据应用使用的 API，声明应用所需的最低API 级别</li>
+<li>声明应用使用或需要的硬件和软件功能，如相机、蓝牙服务或多点触摸屏幕</li>
+<li>应用需要链接的 API 库（Android 框架 API 除外）</li>
+<li><strong>声明组件</strong></li>
+<li><strong>声明组件功能</strong></li>
+<li><strong>声明应用要求</strong></li>
+</ul>
+<h3 id="应用资源"><a href="#应用资源" class="headerlink" title="应用资源"></a>应用资源</h3><p>Android 应用并非只包含代码–它还需要与源代码分离的资源，如图像、音频文件以及任何与应用的视觉呈现有关的内容。例如，您应该通过 XML 文件定义 Activity 用户界面的动画、菜单、样式、颜色和布局。使用应用资源能够在不修改代码的情况下轻松地更新应用的各种特性，并可通过提供备用资源集让您能够针对各种设备配置（如不同的语言和屏幕尺寸）优化您的应用。</p>
+</div></article></div></main><footer><div class="paginator"><a href="/Android/Intent/" class="prev">上一篇</a><a href="/Android%20Project%20Guidelines/1.Project%20Guidelines/" class="next">下一篇</a></div><div id="disqus_thread"></div><script>var disqus_shortname = 'maohhgg';
+var disqus_identifier = 'Android/fundamentals/';
+var disqus_title = 'Android基础（Android笔记一）';
+var disqus_url = 'http://maohhgg.github.io/Android/fundamentals/';
+(function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();</script><script id="dsq-count-scr" src="//maohhgg.disqus.com/count.js" async></script><div class="copyright"><p>© 2015 - 2019 <a href="http://maohhgg.github.io">maohhgg</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/maohhgg/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;e=o.createElement(i);r=o.getElementsByTagName(i)[0];e.src='//www.google-analytics.com/analytics.js';r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));ga('create',"UA-110078780-1",'auto');ga('send','pageview');</script></body></html>

@@ -1,0 +1,144 @@
+<!DOCTYPE html><html lang="zh-cn"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> 项目结构（Android指南一） · maohhgg</title><meta name="description" content="项目结构（Android指南一） - maohhgg"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.ico"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="http://maohhgg.github.io/atom.xml" title="maohhgg"><meta name="generator" content="Hexo 4.0.0"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="/tags/" target="_self" class="nav-list-link">TAG</a></li><li class="nav-list-item"><a href="https://github.com/maohhgg" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">项目结构（Android指南一）</h1><div class="post-tags"><a href="/tags/%E4%BB%A3%E7%A0%81%E6%8C%87%E5%8D%97/">#代码指南</a></div><div class="post-info">2016年9月9日</div><div class="post-content"><h1 id="1-项目指南"><a href="#1-项目指南" class="headerlink" title="1. 项目指南"></a>1. 项目指南</h1><h2 id="1-1-项目结构"><a href="#1-1-项目结构" class="headerlink" title="1.1 项目结构"></a>1.1 项目结构</h2><p>当启动项目时，项目应保持如下的结构：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">src&#x2F;androidTest</span></pre></td></tr><tr><td class="code"><pre><span class="line">src&#x2F;test</span></pre></td></tr><tr><td class="code"><pre><span class="line">src&#x2F;commonTest</span></pre></td></tr><tr><td class="code"><pre><span class="line">src&#x2F;main</span></pre></td></tr></table></figure>
+
+<p><strong>androidTest</strong> - 功能测试文件夹<br><br><strong>test</strong> - 单元测试文件夹<br><br><strong>commonTest</strong> - 文件夹包含AndroidTest和Test的共享代码<br><br><strong>main</strong> - 项目代码</p>
+<p>当修改或增加新的功能应该保持如上项目的结构。</p>
+<p>采用这样的结构能是我们的项目代码和测试相关的代码分离开。CommonTest目录允许我们分享功能测试和单元测试的类，例如模型创建和Dagger测试配置类。</p>
+<h2 id="1-2-文件命名"><a href="#1-2-文件命名" class="headerlink" title="1.2 文件命名"></a>1.2 文件命名</h2><h3 id="1-2-1-类文件"><a href="#1-2-1-类文件" class="headerlink" title="1.2.1 类文件"></a>1.2.1 类文件</h3><p>任何类都应该使用驼峰命名法来命名，例如：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">AndroidActivity, NetworkHelper, UserFragment, PerActivity</span></pre></td></tr></table></figure>
+
+<p>任何继承Android框架组件的类都<strong>必须</strong>使用组件名结尾，例如：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">UserFragment, SignUpActivity, RateAppDialog, PushNotificationServer, NumberView</span></pre></td></tr></table></figure>
+
+<p>使用驼峰命名法命名可以帮助我们分割单词，使得方便阅读。使用框架组件结尾命名的类可以清楚的知道这个类的用。例如，如果你想修改RegistrationDialog文件，使用命名方式命名的可以轻松找到他。</p>
+<h3 id="1-2-1-资源文件"><a href="#1-2-1-资源文件" class="headerlink" title="1.2.1 资源文件"></a>1.2.1 资源文件</h3><p>命名资源文件时应该全部使用小写并用<code>_</code>分割单词而不是使用空格，例如：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">activity_main, fragment_user, item_post</span></pre></td></tr></table></figure>
+
+<p>这样的习惯通常便于在布局文件中找到你想要的，在Android Studio中，布局文件按activity字母顺序排序,fragment和其他布局成一组，这样方便寻找一个文件。除此之外，文件名以组件名开头可以知道是哪个组件或类使用了他们。</p>
+<h3 id="1-2-2-1-Drawable-Files"><a href="#1-2-2-1-Drawable-Files" class="headerlink" title="1.2.2.1 Drawable Files"></a>1.2.2.1 Drawable Files</h3><p>Drawable资源文件通常使用<strong>ic_</strong>作为前缀连接资源的大小和颜色，例如，24dp的白色确认图标</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ic_accept_24dp_white</span></pre></td></tr></table></figure>
+
+<p>那么48dp的黑色取消图标：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">ic_cancel_48dp_black</span></pre></td></tr></table></figure>
+
+<p>这样的命名习惯我们根据drawable文件名字可以知道他的内容，如果文件名中没有大小和颜色，开发者必须打开Drawable文件才能知道。文件名节约了一点点时间:)</p>
+<p>其他drawable文件应该使用相应的前缀，例如：</p>
+<table>
+<thead>
+<tr>
+<th>Type</th>
+<th>Prefix</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Selector</td>
+<td>selector_</td>
+<td>selector_button_cancel</td>
+</tr>
+<tr>
+<td>Background</td>
+<td>bg_</td>
+<td>bg_rounded_button</td>
+</tr>
+<tr>
+<td>Circle</td>
+<td>circle_</td>
+<td>circle_white</td>
+</tr>
+<tr>
+<td>Progress</td>
+<td>progress_</td>
+<td>progress_circle_purple</td>
+</tr>
+<tr>
+<td>Divider</td>
+<td>divider_</td>
+<td>divider_grey</td>
+</tr>
+</tbody></table>
+<p>在Android Studio中这一规范帮助不同类的分组，方便了解哪一类使用了资源。例如，命名为button_cancel的资源，他可能是selector资源也有可能是button资源。而当前命名规范可以清除可能出现的模糊定义。</p>
+<p>当创建不同状态selector资源时，他们的文件名应该有相应后缀。</p>
+<table>
+<thead>
+<tr>
+<th>State</th>
+<th>Suffix</th>
+<th>Example</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Normal</td>
+<td>_normal</td>
+<td>btn_accept_normal</td>
+</tr>
+<tr>
+<td>Pressed</td>
+<td>_pressed</td>
+<td>btn_accept_pressed</td>
+</tr>
+<tr>
+<td>Focused</td>
+<td>_focused</td>
+<td>btn_accept_focused</td>
+</tr>
+<tr>
+<td>Disabled</td>
+<td>_disabled</td>
+<td>btn_accept_disabled</td>
+</tr>
+<tr>
+<td>Selected</td>
+<td>_selected</td>
+<td>btn_accept_selected</td>
+</tr>
+</tbody></table>
+<h3 id="1-2-2-2-Layout-Files"><a href="#1-2-2-2-Layout-Files" class="headerlink" title="1.2.2.2 Layout Files"></a>1.2.2.2 Layout Files</h3><p>当命名Layout文件，文件名开始应该为创建他们的Android组件的名称。例如：</p>
+<table>
+<thead>
+<tr>
+<th>Component</th>
+<th>Class Name</th>
+<th>Layout Name</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Activity</td>
+<td>MainActivity</td>
+<td>activity_main</td>
+</tr>
+<tr>
+<td>Fragment</td>
+<td>MainFragment</td>
+<td>fragment_main</td>
+</tr>
+<tr>
+<td>Dialog</td>
+<td>RateDialog</td>
+<td>dialog_rate</td>
+</tr>
+<tr>
+<td>Widget</td>
+<td>UserProfileView</td>
+<td>view_user_profile</td>
+</tr>
+<tr>
+<td>AdapterView Item</td>
+<td>N/A</td>
+<td>item_follower</td>
+</tr>
+</tbody></table>
+<p>这方法不仅使得很容易找到目录下不同层次的文件，而且了解布局文件属于哪个类时也有帮助。</p>
+<p><strong>Note:</strong> 如果使用合并标签创建布局则应该使用layout_前缀。</p>
+<h3 id="1-2-2-3-Menu-Files"><a href="#1-2-2-3-Menu-Files" class="headerlink" title="1.2.2.3 Menu Files"></a>1.2.2.3 Menu Files</h3><p>菜单文件不需要menu_作为文件名前缀。因为他们已经在menu包文件目录下了，不需要额外的前缀。</p>
+<h3 id="1-2-2-4-Values-Files"><a href="#1-2-2-4-Values-Files" class="headerlink" title="1.2.2.4 Values Files"></a>1.2.2.4 Values Files</h3><p>所有的资源文件应该使用负数形式，例如：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">attrs.xml, strings.xml, styles.xml, colors.xml, dimens.xml</span></pre></td></tr></table></figure>
+</div></article></div></main><footer><div class="paginator"><a href="/Android/fundamentals/" class="prev">上一篇</a><a href="/Android%20Project%20Guidelines/2.Code%20Guidelines/" class="next">下一篇</a></div><div id="disqus_thread"></div><script>var disqus_shortname = 'maohhgg';
+var disqus_identifier = 'Android Project Guidelines/1.Project Guidelines/';
+var disqus_title = '项目结构（Android指南一）';
+var disqus_url = 'http://maohhgg.github.io/Android Project Guidelines/1.Project Guidelines/';
+(function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();</script><script id="dsq-count-scr" src="//maohhgg.disqus.com/count.js" async></script><div class="copyright"><p>© 2015 - 2019 <a href="http://maohhgg.github.io">maohhgg</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/maohhgg/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;e=o.createElement(i);r=o.getElementsByTagName(i)[0];e.src='//www.google-analytics.com/analytics.js';r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));ga('create',"UA-110078780-1",'auto');ga('send','pageview');</script></body></html>

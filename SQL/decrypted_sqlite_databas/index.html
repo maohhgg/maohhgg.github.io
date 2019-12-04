@@ -1,0 +1,35 @@
+<!DOCTYPE html><html lang="zh-cn"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> Android 微信聊天记录导出 · maohhgg</title><meta name="description" content="Android 微信聊天记录导出 - maohhgg"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.ico"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="http://maohhgg.github.io/atom.xml" title="maohhgg"><meta name="generator" content="Hexo 4.0.0"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="/tags/" target="_self" class="nav-list-link">TAG</a></li><li class="nav-list-item"><a href="https://github.com/maohhgg" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">Android 微信聊天记录导出</h1><div class="post-tags"><a href="/tags/sqlite/">#sqlite</a></div><div class="post-info">2018年3月29日</div><div class="post-content"><p>最近在写一个关于微信聊天记录统计和可视化的应用，我使用的Android操作系统，微信的所有的数据都以SQLite数据库的形式保存在手机的 <code>/data</code> 目录下。我只需复制文件就可以来读取所有需要的信息，注意Android系统的根目录需要root权限才能访问，如果没有root权限请先获取root权限。</p>
+<a id="more"></a>
+
+<h3 id="提取信息"><a href="#提取信息" class="headerlink" title="提取信息"></a>提取信息</h3><p>我们需要的文件叫 <code>EnMicroMsg.db</code>，保存的目录是在</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;data&#x2F;data&#x2F;com.tencent.mm&#x2F;MicroMsg&#x2F;&#123;hash&#125;&#x2F;EnMicroMsg.db</span></pre></td></tr></table></figure>
+
+<p>这里的hash值为32位字符串，如果曾经登录多个微信帐号，这里会有多个hash值的文件夹，请根据聊天多少来判断 EnMicroMsg.db 的大小来区别。</p>
+<p>获取加密的PRAGMA KEY<br>微信的数据使用了加密来保护消息，不然就太不安全了。现在我们就需要得到这个加密的密码。<br>加密的密码是 = MD5（手机IMEI + 用户UIN）<br>手机IMEI使用拨号输入 <code>×#06#</code> 可以查看，也可以在 设置&gt;关于手机&gt;状态信息&gt;IMEI信息 中查看。<br>用户UIN：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">&#x2F;data&#x2F;data&#x2F;com.tencent.mm&#x2F;shared_prefs&#x2F;system_config_prefs.xml</span></pre></td></tr></table></figure>
+
+<p>上面路径文件中的 <code>&lt;int name=&#39;default_uin&#39; value=&#39;-125125546&#39;&gt;</code> 这段保存下了UIN，value中的值即为用户的实际UIN，具体值为字符串，可能包含-。</p>
+<p>而将IMEI和UIN计算md5值，md5值的前7位即是我们需要的密码。</p>
+<figure class="highlight php"><table><tr><td class="code"><pre><span class="line"><span class="meta">&lt;?php</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">    $imei = <span class="string">'89455883981245'</span>;</span></pre></td></tr><tr><td class="code"><pre><span class="line">    $uin = <span class="string">'-125125546'</span>;</span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="keyword">echo</span> substr(md5($imei.$uin),<span class="number">0</span>,<span class="number">7</span>)</span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="meta">?&gt;</span></span></pre></td></tr></table></figure>
+
+<h3 id="读取SQLite"><a href="#读取SQLite" class="headerlink" title="读取SQLite"></a>读取SQLite</h3><p>因为是加密的SQLite文件，常规的数据库软件无法完成输入密码的步骤。这里是使用了sqlcipher。</p>
+<p>windows下使用 sqlcipher.exe 图形界面，会提示输入密码。</p>
+<p>我这里使用Ubuntu，可以使用apt直接安装也可以自行下载源码编译。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ sqlcipher --version </span></pre></td></tr><tr><td class="code"><pre><span class="line">3.15.2 2016-11-28 19:13:37 bbd85d235f7037c6a033a9690534391ffeacecc8</span></pre></td></tr></table></figure>
+
+<p>打开加密数据</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ sqlcipher EnMicroMsg.db </span></pre></td></tr><tr><td class="code"><pre><span class="line">sqlite&gt;  PRAGMA key = <span class="string">'xxxxxxx'</span>;</span></pre></td></tr><tr><td class="code"><pre><span class="line">sqlite&gt;</span></pre></td></tr></table></figure>
+
+<p>删除密码<br>删除密码就直接导出一个新的数据库即可</p>
+<figure class="highlight"><table><tr><td class="code"><pre><span class="line">sqlite&gt; PRAGMA cipher_migrate; ATTACH DATABASE "decrypted_database.db" AS decrypted_database KEY "";SELECT sqlcipher_export("decrypted_database");DETACH DATABASE decrypted_database;</span></pre></td></tr></table></figure>
+
+<p>导出的decrypted_database.db即为没有密码的原来数据库了</p>
+</div></article></div></main><footer><div class="paginator"><a href="/Linux/display_system_tray_icons_in_elementaryos/" class="prev">上一篇</a><a href="/Mysql/config/" class="next">下一篇</a></div><div id="disqus_thread"></div><script>var disqus_shortname = 'maohhgg';
+var disqus_identifier = 'SQL/decrypted_sqlite_databas/';
+var disqus_title = 'Android 微信聊天记录导出';
+var disqus_url = 'http://maohhgg.github.io/SQL/decrypted_sqlite_databas/';
+(function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();</script><script id="dsq-count-scr" src="//maohhgg.disqus.com/count.js" async></script><div class="copyright"><p>© 2015 - 2019 <a href="http://maohhgg.github.io">maohhgg</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/maohhgg/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;e=o.createElement(i);r=o.getElementsByTagName(i)[0];e.src='//www.google-analytics.com/analytics.js';r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));ga('create',"UA-110078780-1",'auto');ga('send','pageview');</script></body></html>

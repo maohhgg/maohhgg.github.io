@@ -1,0 +1,78 @@
+<!DOCTYPE html><html lang="zh-cn"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> Intent （Android笔记二） · maohhgg</title><meta name="description" content="Intent （Android笔记二） - maohhgg"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.ico"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="http://maohhgg.github.io/atom.xml" title="maohhgg"><meta name="generator" content="Hexo 4.0.0"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="/tags/" target="_self" class="nav-list-link">TAG</a></li><li class="nav-list-item"><a href="https://github.com/maohhgg" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">Intent （Android笔记二）</h1><div class="post-tags"><a href="/tags/Android/">#Android</a></div><div class="post-info">2016年9月9日</div><div class="post-content"><h1 id="Android笔记"><a href="#Android笔记" class="headerlink" title="Android笔记"></a>Android笔记</h1><hr>
+<h2 id="Intent-和-Intent-过滤器"><a href="#Intent-和-Intent-过滤器" class="headerlink" title="Intent 和 Intent 过滤器"></a>Intent 和 Intent 过滤器</h2><h3 id="Intent"><a href="#Intent" class="headerlink" title="Intent"></a>Intent</h3><p>Intent 是一个消息传递对象，您可以使用它从其他应用组件请求操作。尽管 Intent 可以通过多种方式促进组件之间的通信，但其基本用例主要包括以下三个</p>
+<ul>
+<li><p>启动 Activity：</p>
+<ol>
+<li><code>startActivity()</code></li>
+<li><code>startActivityForResult()</code></li>
+</ol>
+</li>
+<li><p>启动服务：</p>
+<ol>
+<li><code>startService()</code></li>
+<li><code>bindService()</code></li>
+</ol>
+</li>
+<li><p>传递广播：</p>
+<ol>
+<li><code>sendBroadcast()</code></li>
+<li><code>sendOrderedBroadcast()</code></li>
+<li><code>sendStickyBroadcast()</code></li>
+</ol>
+</li>
+</ul>
+<h3 id="Intent-类型"><a href="#Intent-类型" class="headerlink" title="Intent 类型"></a>Intent 类型</h3><ul>
+<li><p>显式 Intent</p>
+<p>按名称（完全限定类名）指定要启动的组件。通常，您会在自己的应用中使用显式 Intent 来启动组件，这是因为您知道要启动的 Activity 或服务的类名。例如，启动新 Activity 以响应用户操作，或者启动服务以在后台下载文件。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Intent downloadIntent = <span class="keyword">new</span> Intent(<span class="keyword">this</span>, DownloadService<span class="class">.<span class="keyword">class</span>)</span>;</span></pre></td></tr><tr><td class="code"><pre><span class="line">downloadIntent.setData(Uri.parse(fileUrl));</span></pre></td></tr><tr><td class="code"><pre><span class="line">startService(downloadIntent);</span></pre></td></tr></table></figure>
+</li>
+<li><p>隐式 Intent</p>
+<p>不会指定特定的组件，而是声明要执行的常规操作，从而允许其他应用中的组件来处理它。例如，如需在地图上向用户显示位置，则可以使用隐式 Intent，请求另一具有此功能的应用在地图上显示指定的位置。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Intent sendIntent = <span class="keyword">new</span> Intent();</span></pre></td></tr><tr><td class="code"><pre><span class="line">  sendIntent.setAction(Intent.ACTION_SEND);</span></pre></td></tr><tr><td class="code"><pre><span class="line">  sendIntent.putExtra(Intent.EXTRA_TEXT, textMessage);</span></pre></td></tr><tr><td class="code"><pre><span class="line">  sendIntent.setType(<span class="string">"text/plain"</span>);</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">  <span class="keyword">if</span> (sendIntent.resolveActivity(getPackageManager()) != <span class="keyword">null</span>) &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">      startActivity(sendIntent);</span></pre></td></tr><tr><td class="code"><pre><span class="line">  &#125;</span></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>创建显式 Intent 启动 Activity 或服务时，系统将立即启动 Intent 对象中指定的应用组件。</p>
+<p>创建隐式 Intent 时，Android 系统通过将 Intent 的内容与在设备上其他应用的清单文件中声明的 Intent 过滤器进行比较，从而找到要启动的相应组件。Intent如果 Intent 与 Intent 过滤器匹配，则系统将启动该组件，并将其传递给对象。如果多个 Intent 过滤器兼容，则系统会显示一个对话框，支持用户选取要使用的应用。</p>
+<blockquote>
+<p>警告：为了确保应用的安全性，启动 Service 时，请始终使用显式 Intent，且不要为服务声明 Intent 过滤器。使用隐式 Intent 启动服务存在安全隐患，因为您无法确定哪些服务将响应 Intent，且用户无法看到哪些服务已启动。从 Android 5.0（API 级别 21）开始，如果使用隐式 Intent 调用 bindService()，系统会抛出异常。</p>
+</blockquote>
+<h3 id="Intent-过滤器（IntentFilters）"><a href="#Intent-过滤器（IntentFilters）" class="headerlink" title="Intent 过滤器（IntentFilters）"></a>Intent 过滤器（IntentFilters）</h3><p>Intent 过滤器是应用清单文件中的一个表达式，它指定该组件要接收的 Intent 类型。例如，通过为 Activity 声明 Intent 过滤器，您可以使其他应用能够直接使用某一特定类型的 Intent 启动 Activity。同样，如果您没有为 Activity 声明任何 Intent 过滤器，则 Activity 只能通过显式 Intent 启动。</p>
+<h3 id="构建-Intent"><a href="#构建-Intent" class="headerlink" title="构建 Intent"></a>构建 Intent</h3><ul>
+<li><p>组件名称</p>
+<p>要启动的组件名称。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">组件名称 Service<span class="class">.<span class="keyword">class</span></span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="class"><span class="title">Intent</span> <span class="title">intent</span> </span>= <span class="keyword">new</span> Intent(<span class="keyword">this</span>,Service<span class="class">.<span class="keyword">class</span>)</span></span></pre></td></tr></table></figure>
+</li>
+<li><p>操作</p>
+<p>指定要执行的通用操作（例如，”查看”或”选取”）的字符串。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">操作 ACTION_VIEW ACTION_EDIT ACTION_PICK</span></pre></td></tr><tr><td class="code"><pre><span class="line">intent.setAction(Intent.ACTION_VIEW);</span></pre></td></tr><tr><td class="code"><pre><span class="line">intent.setAction(Intent.ACTION_EDIT);</span></pre></td></tr><tr><td class="code"><pre><span class="line">intent.setAction(Intent.ACTION_PICK);</span></pre></td></tr></table></figure>
+
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">intent-filter</span>&gt;</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">  <span class="tag">&lt;<span class="name">action</span> <span class="attr">android:name</span>=<span class="string">"android.intent.action.VIEW"</span> /&gt;</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">  <span class="tag">&lt;<span class="name">action</span> <span class="attr">android:name</span>=<span class="string">"android.intent.action.EDIT"</span> /&gt;</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">  <span class="tag">&lt;<span class="name">action</span> <span class="attr">android:name</span>=<span class="string">"android.intent.action.PICK"</span> /&gt;</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">intent-filter</span>&gt;</span></span></pre></td></tr></table></figure>
+</li>
+<li><p>数据 &amp; 类别</p>
+<p>引用待操作数据和/或该数据 MIME 类型的 URI（Uri 对象）。提供的数据类型通常由 Intent 的操作决定。例如，如果操作是 ACTION_EDIT，则数据应包含待编辑文档的 URI。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">数据：content:<span class="comment">//contacts/people 全部联系人  </span></span></pre></td></tr><tr><td class="code"><pre><span class="line">类别：text/plain 纯文本</span></pre></td></tr><tr><td class="code"><pre><span class="line">Uri data = Uri.parse(<span class="string">"content://contacts/people"</span>);</span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">// intent.setData(data);</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">// intent.setType("text/plain");</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">intent.setDataAndType(data,<span class="string">"text/plain"</span>);</span></pre></td></tr></table></figure>
+
+<blockquote>
+<p>警告：若要同时设置 URI 和 MIME 类型，请勿调用 setData() 和 setType()，因为它们会互相抵消彼此的值。请始终使用 setDataAndType() 同时设置 URI 和 MIME 类型。</p>
+</blockquote>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">intent-filter</span>&gt;</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">  <span class="tag">&lt;<span class="name">action</span> <span class="attr">android:name</span>=<span class="string">"android.intent.action.INSERT"</span> /&gt;</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">  <span class="tag">&lt;<span class="name">category</span> <span class="attr">android:name</span>=<span class="string">"android.intent.category.DEFAULT"</span> /&gt;</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">  <span class="tag">&lt;<span class="name">data</span> <span class="attr">android:scheme</span>=<span class="string">"content://contacts/people"</span> /&gt;</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">  <span class="tag">&lt;<span class="name">data</span> <span class="attr">mimeType</span>=<span class="string">"text/plain"</span> /&gt;</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="tag">&lt;/<span class="name">intent-filter</span>&gt;</span></span></pre></td></tr></table></figure>
+</li>
+<li><p>Extra</p>
+<p>携带完成请求操作所需的附加信息的键值对。正如某些操作使用特定类型的数据 URI 一样，有些操作也使用特定的附加数据。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Bundle bundle = <span class="keyword">new</span> Bundle();</span></pre></td></tr><tr><td class="code"><pre><span class="line">bundle.putString(<span class="string">"name"</span>, <span class="string">"jhon"</span>);</span></pre></td></tr><tr><td class="code"><pre><span class="line">intent.putExtra(<span class="string">"key"</span>,bundle);</span></pre></td></tr></table></figure>
+</li>
+<li><p>标志</p>
+<p>在 Intent 类中定义的、充当 Intent 元数据的标志</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);</span></pre></td></tr></table></figure>
+</li>
+</ul>
+</div></article></div></main><footer><div class="paginator"><a href="/Android/Animation/" class="prev">上一篇</a><a href="/Android/fundamentals/" class="next">下一篇</a></div><div id="disqus_thread"></div><script>var disqus_shortname = 'maohhgg';
+var disqus_identifier = 'Android/Intent/';
+var disqus_title = 'Intent （Android笔记二）';
+var disqus_url = 'http://maohhgg.github.io/Android/Intent/';
+(function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();</script><script id="dsq-count-scr" src="//maohhgg.disqus.com/count.js" async></script><div class="copyright"><p>© 2015 - 2019 <a href="http://maohhgg.github.io">maohhgg</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/maohhgg/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;e=o.createElement(i);r=o.getElementsByTagName(i)[0];e.src='//www.google-analytics.com/analytics.js';r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));ga('create',"UA-110078780-1",'auto');ga('send','pageview');</script></body></html>

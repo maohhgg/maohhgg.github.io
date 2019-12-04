@@ -1,0 +1,62 @@
+<!DOCTYPE html><html lang="zh-cn"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> Java 反射机制 · maohhgg</title><meta name="description" content="Java 反射机制 - maohhgg"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.ico"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="http://maohhgg.github.io/atom.xml" title="maohhgg"><meta name="generator" content="Hexo 4.0.0"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="/tags/" target="_self" class="nav-list-link">TAG</a></li><li class="nav-list-item"><a href="https://github.com/maohhgg" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">Java 反射机制</h1><div class="post-tags"><a href="/tags/java/">#java</a></div><div class="post-info">2016年10月8日</div><div class="post-content"><p>要让Java程序能够运行，就得让Java类被Java虚拟机加载。Java类如果不被Java虚拟机加载就不能正常运行。正常情况下，我们运行的所有的程序在编译期时候就已经把那个类被加载了。</p>
+<p>Java编译时并不确定是哪个类被加载了，而是在程序运行的时候才自审、探知、加载所需要的类。在编译期时使用并不知道的类。这样的编译特点就是java反射。</p>
+<a id="more"></a>
+<h1 id="Java反射的作用"><a href="#Java反射的作用" class="headerlink" title="Java反射的作用"></a>Java反射的作用</h1><p>假如有两个程序员，一个程序员在写程序的时需要使用第二个程序员所写的类，但第二个程序员并没完成他所写的类。那么第一个程序员的代码是不能通过编译的。此时，利用Java反射的机制，就可以让第一个程序员在没有得到第二个程序员所写的类的时候，来完成自身代码的编译。</p>
+<p>Java的反射机制它知道类的基本结构，这种对Java类结构探知的能力，我们称为Java类的”自审”。如IDE中，在对象后按下<code>.</code>，编译工具就会自动的把该对象能够使用的所有的方法和属性全部都列出来，供用户进行选择。这就是利用了Java反射的原理，是对我们创建对象的探知、自审。</p>
+<h1 id="Class-类"><a href="#Class-类" class="headerlink" title="Class 类"></a>Class 类</h1><p>要正确使用Java反射机制就得使用java.lang.Class这个类，即要使用Java反射机制的类要继承于java.lang.Class这个类。它是Java反射机制的起源。当一个类被加载以后，Java虚拟机就会自动产生一个Class对象。通过这个Class对象我们就能获得加载到虚拟机当中这个Class对象对应的方法、成员以及构造方法的声明和定义等信息。</p>
+<h1 id="反射功能"><a href="#反射功能" class="headerlink" title="反射功能"></a>反射功能</h1><p>通过反射机制可以获得</p>
+<ol>
+<li>Class 对象</li>
+<li>类名</li>
+<li>修饰符</li>
+<li>包信息</li>
+<li>父类</li>
+<li>实现的接口</li>
+<li>构造器</li>
+<li>方法</li>
+<li>变量</li>
+<li>注解</li>
+</ol>
+<p>Java反射机制使用java.lang.Class这个类，可以在JavaDoc中的<a href="http://docs.oracle.com/javase/8/docs/api/java/lang/Class.html" target="_blank" rel="noopener">java.lang.Class</a>查看到更多的描述。</p>
+<h2 id="获取Class对象"><a href="#获取Class对象" class="headerlink" title="获取Class对象"></a>获取Class对象</h2><p>编译期知道一个类的名字的话，那么你可以使用如下的方式获取一个类的 Class 对象。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Class classA = ClassName<span class="class">.<span class="keyword">class</span></span>;</span></pre></td></tr></table></figure>
+
+<p>如果你在编译期不知道类的名字，但是你可以在运行期获得到类名的字符串,那么你则可以这么做来获取 Class 对象:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">String className = <span class="string">"GetClassName"</span> ; <span class="comment">// 在运行期获取的类名字符串</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">Class classB = Class.forName(className);</span></pre></td></tr></table></figure>
+
+<p>在使用 Class.forName() 方法时，你必须提供一个类的全名，全名即是包名加上类名。比如MyObject类在com.example.myapp包中，那么他的全名是com.example.myapp.MyObject。如果在调用Class.forName()方法时，没有在编译路径下(classpath)找到对应的类，那么将会抛出ClassNotFoundException。</p>
+<h2 id="获取类名"><a href="#获取类名" class="headerlink" title="获取类名"></a>获取类名</h2><p>java.lang.Class提供了两个获取类名的方法。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Class classA = ClassName<span class="class">.<span class="keyword">class</span></span>;</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">// 通过 getName() 方法返回类的全名 包名+类名</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">String className = classA.getName();</span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">// 使用getSimpleName() 仅仅可以得到类名</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">String simpleClassName = classA.getSimpleName();</span></pre></td></tr></table></figure>
+
+<h2 id="获取修饰符"><a href="#获取修饰符" class="headerlink" title="获取修饰符"></a>获取修饰符</h2><p>可以通过 Class 对象来访问一个类的修饰符， 即public,private,static 等等的关键字，修饰符都被包装成一个int类型的数字，这样每个修饰符都是一个位标识(flag bit)，这个位标识可以设置和清除修饰符的类型。 可以使用 java.lang.reflect.Modifier 类中的方法来检查修饰符的类型：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Class classA = ClassName<span class="class">.<span class="keyword">class</span></span>;</span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> modifiers = classA.getModifiers();</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">Modifier.isAbstract(<span class="keyword">int</span> modifiers);</span></pre></td></tr><tr><td class="code"><pre><span class="line">Modifier.isFinal(<span class="keyword">int</span> modifiers);</span></pre></td></tr><tr><td class="code"><pre><span class="line">Modifier.isInterface(<span class="keyword">int</span> modifiers);</span></pre></td></tr><tr><td class="code"><pre><span class="line">Modifier.isNative(<span class="keyword">int</span> modifiers);</span></pre></td></tr><tr><td class="code"><pre><span class="line">Modifier.isPrivate(<span class="keyword">int</span> modifiers);</span></pre></td></tr><tr><td class="code"><pre><span class="line">Modifier.isProtected(<span class="keyword">int</span> modifiers);</span></pre></td></tr><tr><td class="code"><pre><span class="line">Modifier.isPublic(<span class="keyword">int</span> modifiers);</span></pre></td></tr><tr><td class="code"><pre><span class="line">Modifier.isStatic(<span class="keyword">int</span> modifiers);</span></pre></td></tr><tr><td class="code"><pre><span class="line">Modifier.isStrict(<span class="keyword">int</span> modifiers);</span></pre></td></tr><tr><td class="code"><pre><span class="line">Modifier.isSynchronized(<span class="keyword">int</span> modifiers);</span></pre></td></tr><tr><td class="code"><pre><span class="line">Modifier.isTransient(<span class="keyword">int</span> modifiers);</span></pre></td></tr><tr><td class="code"><pre><span class="line">Modifier.isVolatile(<span class="keyword">int</span> modifiers);</span></pre></td></tr></table></figure>
+
+<h2 id="获取包信息"><a href="#获取包信息" class="headerlink" title="获取包信息"></a>获取包信息</h2><p>通过 Package 对象你可以获取包的相关信息，比如包名，获取更多的 Package 类信息可以阅读 <a href="http://docs.oracle.com/javase/8/docs/api/java/lang/Package.html" target="_blank" rel="noopener">java.lang.Package</a>。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Class classA = ClassName<span class="class">.<span class="keyword">class</span></span>;</span></pre></td></tr><tr><td class="code"><pre><span class="line">Package <span class="keyword">package</span> = classA.getPackage();</span></pre></td></tr></table></figure>
+
+<h2 id="获取父类"><a href="#获取父类" class="headerlink" title="获取父类"></a>获取父类</h2><p>通过 Class 对象你可以访问类的父类，可以看到 superclass 对象也是一个 Class 类的实例，所以你可以继续在这个对象上进行反射操作。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Class classA = ClassName<span class="class">.<span class="keyword">class</span></span>;</span></pre></td></tr><tr><td class="code"><pre><span class="line">Class superClass = classA.getSuperClass();</span></pre></td></tr></table></figure>
+
+<h2 id="获取被实现的接口"><a href="#获取被实现的接口" class="headerlink" title="获取被实现的接口"></a>获取被实现的接口</h2><p>可以获取指定类所实现的接口集合，由于一个类可以实现多个接口，因此 getInterfaces(); 方法返回一个 Class 数组，在 Java 中接口同样有对应的 Class 对象。 注意：getInterfaces() 方法仅仅只返回当前类所实现的接口。当前类的父类如果实现了接口，这些接口是不会在返回的 Class 集合中的，尽管实际上当前类其实已经实现了父类接口。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Class  classA = ClassName<span class="class">.<span class="keyword">class</span></span>;</span></pre></td></tr><tr><td class="code"><pre><span class="line">Class[] interfaces = classA.getInterfaces();</span></pre></td></tr></table></figure>
+
+<h2 id="构造器"><a href="#构造器" class="headerlink" title="构造器"></a>构造器</h2><p>你可以通过如下方式访问一个类的构造方法，更多有关 Constructor 的信息可以访问 <a href="http://docs.oracle.com/javase/8/docs/api/java/lang/reflect/Constructor.html" target="_blank" rel="noopener">Constructor</a>。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Constructor[] constructors = aClass.getConstructors();</span></pre></td></tr></table></figure>
+
+<h2 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h2><p>你可以通过如下方式访问一个类的所有方法：更多有关 Method 的信息可以 <a href="http://docs.oracle.com/javase/8/docs/api/java/lang/reflect/Method.html" target="_blank" rel="noopener">Method</a></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Method[] method = aClass.getMethods();</span></pre></td></tr></table></figure>
+
+<h2 id="变量"><a href="#变量" class="headerlink" title="变量"></a>变量</h2><p>你可以通过如下方式访问一个类的成员变量，更多有关 Field 的信息可以访问<a href="http://docs.oracle.com/javase/8/docs/api/java/lang/reflect/Field.html" target="_blank" rel="noopener">Field</a>。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Field[] method = aClass.getFields();</span></pre></td></tr></table></figure>
+
+<h2 id="注解"><a href="#注解" class="headerlink" title="注解"></a>注解</h2><p>你可以通过如下方式访问一个类的注解：更多有关 Annotation 的信息可以 <a href="http://docs.oracle.com/javase/8/docs/api/java/lang/annotation/Annotation.html" target="_blank" rel="noopener">Annotation</a></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Annotation[] annotations = aClass.getAnnotations();</span></pre></td></tr></table></figure>
+</div></article></div></main><footer><div class="paginator"><a href="/YAML/yaml/" class="prev">上一篇</a><a href="/Java/lambda/" class="next">下一篇</a></div><div id="disqus_thread"></div><script>var disqus_shortname = 'maohhgg';
+var disqus_identifier = 'Java/Reflect/';
+var disqus_title = 'Java 反射机制';
+var disqus_url = 'http://maohhgg.github.io/Java/Reflect/';
+(function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();</script><script id="dsq-count-scr" src="//maohhgg.disqus.com/count.js" async></script><div class="copyright"><p>© 2015 - 2019 <a href="http://maohhgg.github.io">maohhgg</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/maohhgg/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;e=o.createElement(i);r=o.getElementsByTagName(i)[0];e.src='//www.google-analytics.com/analytics.js';r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));ga('create',"UA-110078780-1",'auto');ga('send','pageview');</script></body></html>

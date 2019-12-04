@@ -1,0 +1,58 @@
+<!DOCTYPE html><html lang="zh-cn"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> Linux 笔记 · maohhgg</title><meta name="description" content="Linux 笔记 - maohhgg"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.ico"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="http://maohhgg.github.io/atom.xml" title="maohhgg"><meta name="generator" content="Hexo 4.0.0"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="/tags/" target="_self" class="nav-list-link">TAG</a></li><li class="nav-list-item"><a href="https://github.com/maohhgg" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">Linux 笔记</h1><div class="post-tags"><a href="/tags/Linux/">#Linux</a></div><div class="post-info">2017年5月31日</div><div class="post-content"><h4 id="代理设置"><a href="#代理设置" class="headerlink" title="代理设置"></a>代理设置</h4><h5 id="Linux-终端代理"><a href="#Linux-终端代理" class="headerlink" title="Linux 终端代理"></a>Linux 终端代理</h5><p>之前用上了Shadowsocks来代理上网，在终端下需要http代理，不能能使用socks5代理，需要将socks5代理转为http代理。</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> sudo apt install polipo</span></span></pre></td></tr></table></figure>
+<p>接着修改polipo的配置文件/etc/polipo/config：</p>
+<figure class="highlight ini"><table><tr><td class="code"><pre><span class="line"><span class="attr">logSyslog</span> = <span class="literal">true</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="attr">logFile</span> = /var/log/polipo/polipo.log</span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="attr">proxyAddress</span> = <span class="string">"0.0.0.0"</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="attr">proxyPort</span> = <span class="number">8123</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="attr">socksParentProxy</span> = <span class="string">"127.0.0.1:1080"</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="attr">socksProxyType</span> = socks5</span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="attr">chunkHighMark</span> = <span class="number">50331648</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="attr">objectHighMark</span> = <span class="number">16384</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="attr">serverMaxSlots</span> = <span class="number">64</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="attr">serverSlots</span> = <span class="number">16</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="attr">serverSlots1</span> = <span class="number">32</span></span></pre></td></tr></table></figure>
+<p>重启polipo服务并为终端配置http代理：</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> sudo /etc/init.d/polipo restart</span></span></pre></td></tr></table></figure>
+
+
+<h5 id="Ubuntu-apt-get-代理"><a href="#Ubuntu-apt-get-代理" class="headerlink" title="Ubuntu apt-get 代理"></a>Ubuntu apt-get 代理</h5><p>虽然各大发行版有国内的镜像，但是我用的elementary OS暂时还没有国内的镜像。而直接下载的速度只有几KB，需要对apt-get进行代理访问。</p>
+<p>可以修改apt-get的配置文件/etc/apt/apt.conf：</p>
+<figure class="highlight"><table><tr><td class="code"><pre><span class="line">Acquire::http::Proxy = "http://127.0.0.1:8123"</span></pre></td></tr><tr><td class="code"><pre><span class="line">Acquire::ftp::proxy = "ftp://127.0.0.1:8123"</span></pre></td></tr><tr><td class="code"><pre><span class="line">Acquire::https::proxy = "https://127.0.0.1:8123"</span></pre></td></tr></table></figure>
+<p>也可以在使用的时候进行代理，这样比较符合日常使用，普通就用国内的镜像加速，必须使用国外镜像下载就加上代理。</p>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash"> sudo apt -o Acquire::http::Proxy=<span class="string">"http://127.0.0.1:8123"</span> update</span></span></pre></td></tr></table></figure>
+
+
+<h4 id="Cherry-Trail平板安装-Ubuntu"><a href="#Cherry-Trail平板安装-Ubuntu" class="headerlink" title="Cherry Trail平板安装 Ubuntu"></a>Cherry Trail平板安装 Ubuntu</h4><p>System: cube </p>
+<p>product: SurfTab twin 11.6 </p>
+<p>设备正常使用：</p>
+<ul>
+<li><input checked disabled type="checkbox"> CPU : Intel Atom x5-Z8350  </li>
+<li><input checked disabled type="checkbox"> GPU : Intel® HD Graphics 400</li>
+<li><input checked disabled type="checkbox"> eMMC : 某寨品牌eMMC<blockquote>
+<p>早期的内核对eMMC支持不完善，在内核4.10以前都有可能遇到瞬间读写太大，导致卡死，我在使用Ubuntu16.04.2和基于Ubuntu16.04.2也遇到了这个问题。建议使用新内核的Ubuntu17.04，或者使用Debian。能避开这个问题</p>
+</blockquote>
+</li>
+<li><input checked disabled type="checkbox"> Wifi : rtl8723bs<blockquote>
+<p>github 有开源驱动 <a href="https://github.com/hadess/rtl8723bs.git" target="_blank" rel="noopener">https://github.com/hadess/rtl8723bs.git</a>， 现在已经加入在 kernel 4.12-rc1中了。可直接更新内核和更新linux-firmware，直接驱动。</p>
+</blockquote>
+</li>
+<li><input checked disabled type="checkbox"> Battery </li>
+<li><input checked disabled type="checkbox"> Bluetooth   </li>
+</ul>
+<p>暂时没法使用</p>
+<ul>
+<li><input disabled type="checkbox"> <del>Audio : RealTek ALC5642</del><blockquote>
+<p><del>内核中无驱动， 在kernel 4.12-rc1开始将没法识别的定义为 <code>bytcht_nocodec</code><a href="http://elixir.free-electrons.com/linux/v4.12-rc1/source/sound/soc/intel/atom/sst/sst_acpi.c#L520" target="_blank" rel="noopener">http://elixir.free-electrons.com/linux/v4.12-rc1/source/sound/soc/intel/atom/sst/sst_acpi.c#L520</a>，这样不能被驱动，打上<a href="https://github.com/plbossart/UCM" target="_blank" rel="noopener">https://github.com/plbossart/UCM</a>中的<code>bytcht_nocodec</code>能够驱动，但是配置不对。导出DSDT，使用iasl转换为可读模式。</del></p>
+  <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">Name (_HID, &quot;10EC5640&quot; &#x2F;* Realtek I2S Audio Codec *&#x2F;)  &#x2F;&#x2F; _HID: Hardware ID</span></pre></td></tr><tr><td class="code"><pre><span class="line">          Name (_CID, &quot;10EC5640&quot; &#x2F;* Realtek I2S Audio Codec *&#x2F;)  &#x2F;&#x2F; _CID: Compatible ID</span></pre></td></tr><tr><td class="code"><pre><span class="line">          Name (_DDN, &quot;ALC5642&quot;)  &#x2F;&#x2F; _DDN: DOS Device Name</span></pre></td></tr></table></figure>
+<p>  根据CID可知 ALC5642 和 ALC5640 基本一样，这里需要在kernel <code>sound/soc/intel/atom/sst/sst_acpi.c</code> 源码中加上一行<code>{&quot;10EC5640&quot;, &quot;bytcht_rt5642&quot;, &quot;intel/fw_sst_22a8.bin&quot;, &quot;bytcht_rt5642&quot;, NULL, &amp;chv_platform_data },</code>，并重新编译打包。（留着有空再做）</p>
+</blockquote>
+</li>
+<li><input disabled type="checkbox"> Audio : RealTek ALC5651<blockquote>
+<p>最新kernel 4.12-rc4已经包含此驱动。（能识别硬件，但不能正常驱动，使用 <a href="https://github.com/plbossart/UCM" target="_blank" rel="noopener">https://github.com/plbossart/UCM</a> 能驱动硬件，配置错误，使用 <code>alsamixer</code> 命令手动配置能使耳机口正常，）</p>
+</blockquote>
+</li>
+<li><input disabled type="checkbox"> Touch screen: gslx680 - Resolution 1920x1080<blockquote>
+<p>按照 <a href="https://github.com/onitake/gslx680-acpi" target="_blank" rel="noopener">https://github.com/onitake/gslx680-acpi</a> 将驱动模块引入内核， 使用 <a href="https://github.com/onitake/gsl-firmware" target="_blank" rel="noopener">https://github.com/onitake/gsl-firmware</a>  <code>fwtool</code> 工具配置好分辨率</p>
+</blockquote>
+</li>
+</ul>
+</div></article></div></main><footer><div class="paginator"><a href="/Linux/ubuntu-downgrade/" class="prev">上一篇</a><a href="/Linux/linux-mount-smaba/" class="next">下一篇</a></div><div id="disqus_thread"></div><script>var disqus_shortname = 'maohhgg';
+var disqus_identifier = 'Linux/note/';
+var disqus_title = 'Linux 笔记';
+var disqus_url = 'http://maohhgg.github.io/Linux/note/';
+(function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();</script><script id="dsq-count-scr" src="//maohhgg.disqus.com/count.js" async></script><div class="copyright"><p>© 2015 - 2019 <a href="http://maohhgg.github.io">maohhgg</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/maohhgg/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;e=o.createElement(i);r=o.getElementsByTagName(i)[0];e.src='//www.google-analytics.com/analytics.js';r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));ga('create',"UA-110078780-1",'auto');ga('send','pageview');</script></body></html>

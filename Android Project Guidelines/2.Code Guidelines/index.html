@@ -1,0 +1,578 @@
+<!DOCTYPE html><html lang="zh-cn"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> 代码规范（Android指南二） · maohhgg</title><meta name="description" content="代码规范（Android指南二） - maohhgg"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.ico"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="http://maohhgg.github.io/atom.xml" title="maohhgg"><meta name="generator" content="Hexo 4.0.0"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="/tags/" target="_self" class="nav-list-link">TAG</a></li><li class="nav-list-item"><a href="https://github.com/maohhgg" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">代码规范（Android指南二）</h1><div class="post-tags"><a href="/tags/%E4%BB%A3%E7%A0%81%E6%8C%87%E5%8D%97/">#代码指南</a></div><div class="post-info">2016年9月9日</div><div class="post-content"><h1 id="2-代码规范"><a href="#2-代码规范" class="headerlink" title="2. 代码规范"></a>2. 代码规范</h1><h2 id="2-1-Java语言规范"><a href="#2-1-Java语言规范" class="headerlink" title="2.1 Java语言规范"></a>2.1 Java语言规范</h2><h3 id="2-1-1-绝对不忽略异常"><a href="#2-1-1-绝对不忽略异常" class="headerlink" title="2.1.1 绝对不忽略异常"></a>2.1.1 绝对不忽略异常</h3><p>以正确的方式处理异常。例如：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setUserId</span><span class="params">(String id)</span> </span>&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="keyword">try</span> &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">        mUserId = Integer.parseInt(id);</span></pre></td></tr><tr><td class="code"><pre><span class="line">    &#125; <span class="keyword">catch</span> (NumberFormatException e) &#123; &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<p>这里将会给开发者和用户带来不清楚的消息。如果发生错误并捕获到异常时，这种写法会使得开发者很难debug并且会给用户带来困惑，如有必要提示用户并且在console记录信息让我们去debug。应如下：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setCount</span><span class="params">(String count)</span> </span>&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="keyword">try</span> &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">        count = Integer.parseInt(id);</span></pre></td></tr><tr><td class="code"><pre><span class="line">    &#125; <span class="keyword">catch</span> (NumberFormatException e) &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">        count = <span class="number">0</span>;</span></pre></td></tr><tr><td class="code"><pre><span class="line">        Log.e(TAG, <span class="string">"There was an error parsing the count "</span> + e);</span></pre></td></tr><tr><td class="code"><pre><span class="line">        DialogFactory.showErrorMessage(R.string.error_message_parsing_count);</span></pre></td></tr><tr><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<p>适当处理如下的错误：</p>
+<ul>
+<li>显示一个消息给用户提示他们出现了一个错误。</li>
+<li>设置时有默认的选项</li>
+<li>抛出一个合适的异常</li>
+</ul>
+<h3 id="2-1-2-不要捕捉普通异常"><a href="#2-1-2-不要捕捉普通异常" class="headerlink" title="2.1.2 不要捕捉普通异常"></a>2.1.2 不要捕捉普通异常</h3><p>捕捉异常时不应该有下面的情况：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">openCustomTab</span><span class="params">(Context context, Uri uri)</span> </span>&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">    Intent intent = buildIntent(context, uri);</span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="keyword">try</span> &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">        context.startActivity(intent);</span></pre></td></tr><tr><td class="code"><pre><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">        Log.e(TAG, <span class="string">"There was an error opening the custom tab "</span> + e);</span></pre></td></tr><tr><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<p>为什么?</p>
+<p><em>通常不要这样做，捕捉或者抛出（最好不要抛出，因为它有可能包是错误）普通异常是不恰当的，这样是非常危险的，你有可能捕捉到系统级别的错误（像RuntimeExceptions和ClassCastException），而你的代码就覆盖了他们的提示。意味着有时有新类型的异常发生在这段代码，编译器不会提示你去处理新类型的异常，多数情况下不应该用同样的方式处理不同的异常。</em> - 遵从Android代码规范</p>
+<h3 id="2-1-3-异常分组"><a href="#2-1-3-异常分组" class="headerlink" title="2.1.3 异常分组"></a>2.1.3 异常分组</h3><p>在相同位置有不同的异常发生，为了增加代码可读性和避免重复代码，你应该如下这样做：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">openCustomTab</span><span class="params">(Context context, @Nullable Uri uri)</span> </span>&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">    Intent intent = buildIntent(context, uri);</span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="keyword">try</span> &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">        context.startActivity(intent);</span></pre></td></tr><tr><td class="code"><pre><span class="line">    &#125; <span class="keyword">catch</span> (ActivityNotFoundException e) &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">        Log.e(TAG, <span class="string">"There was an error opening the custom tab "</span> + e);</span></pre></td></tr><tr><td class="code"><pre><span class="line">    &#125; <span class="keyword">catch</span> (NullPointerException e) &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">        Log.e(TAG, <span class="string">"There was an error opening the custom tab "</span> + e);</span></pre></td></tr><tr><td class="code"><pre><span class="line">    &#125; <span class="keyword">catch</span> (SomeOtherException e) &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">        <span class="comment">// Show some dialog</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<p>也可以这样做:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">openCustomTab</span><span class="params">(Context context, @Nullable Uri uri)</span> </span>&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">    Intent intent = buildIntent(context, uri);</span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="keyword">try</span> &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">        context.startActivity(intent);</span></pre></td></tr><tr><td class="code"><pre><span class="line">    &#125; <span class="keyword">catch</span> (ActivityNotFoundException e | NullPointerException e) &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">        Log.e(TAG, <span class="string">"There was an error opening the custom tab "</span> + e);</span></pre></td></tr><tr><td class="code"><pre><span class="line">    &#125; <span class="keyword">catch</span> (SomeOtherException e) &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">        <span class="comment">// Show some dialog</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<h3 id="2-1-4-使用try-catch来抛出异常"><a href="#2-1-4-使用try-catch来抛出异常" class="headerlink" title="2.1.4 使用try-catch来抛出异常"></a>2.1.4 使用try-catch来抛出异常</h3><p>使用try-catch语句改善发生异常代码的可读性。当异常出现是，更容易调试和处理错误。</p>
+<h3 id="2-1-6-禁止全部导入"><a href="#2-1-6-禁止全部导入" class="headerlink" title="2.1.6 禁止全部导入"></a>2.1.6 禁止全部导入</h3><p>当导入库时，不应该导入全部包，比如：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> android.support.v7.widget.*;</span></pre></td></tr></table></figure>
+
+<p>相反，应该这样：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> android.support.v7.widget.RecyclerView;</span></pre></td></tr></table></figure>
+
+<h3 id="2-1-7-不要保留没使用的库"><a href="#2-1-7-不要保留没使用的库" class="headerlink" title="2.1.7 不要保留没使用的库"></a>2.1.7 不要保留没使用的库</h3><p>有时删除一些代码而有的库不再使用，那么应该删除导入这些库的代码。</p>
+<h2 id="2-2-Java代码规范"><a href="#2-2-Java代码规范" class="headerlink" title="2.2 Java代码规范"></a>2.2 Java代码规范</h2><h3 id="2-2-1-字段定义和命名"><a href="#2-2-1-字段定义和命名" class="headerlink" title="2.2.1 字段定义和命名"></a>2.2.1 字段定义和命名</h3><p>所有属性应在该文件的顶部被声明, 遵循下面的规则:</p>
+<ul>
+<li>不是静态私有属性不要使用<code>m</code>开始，正确示例：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">userSignedIn, userNameText, acceptButton</span></pre></td></tr></table></figure>
+
+<p>错误示范:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">mUserSignedIn, mUserNameText, mAcceptButton</span></pre></td></tr></table></figure>
+
+<ul>
+<li>静态私有属性使用需要使用<code>s</code>开始,正确示例：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">someStaticField, userNameText</span></pre></td></tr></table></figure>
+
+<p>错误示范:</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">sSomeStaticField, sUserNameText</span></pre></td></tr></table></figure>
+
+<ul>
+<li>其他属性使用小写字母开头：</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> numOfChildren;</span></pre></td></tr><tr><td class="code"><pre><span class="line">String username;</span></pre></td></tr></table></figure>
+
+<ul>
+<li>静态的终态（final）属性（即常量），所有字母要大写。</li>
+</ul>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> PAGE_COUNT = <span class="number">0</span>;</span></pre></td></tr></table></figure>
+
+<p>属性名称不应定义模糊，比如：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> e; <span class="comment">//列表中的元素的数目</span></span></pre></td></tr></table></figure>
+
+<p>使用他的作用作为名称，而不是留下注释来说明。这样更好</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> numberOfElements;</span></pre></td></tr></table></figure>
+
+<h3 id="2-2-1-2-View属性名"><a href="#2-2-1-2-View属性名" class="headerlink" title="2.2.1.2 View属性名"></a>2.2.1.2 View属性名</h3><p>当属性涉及views时，名称的最后一个单词应该是<code>view</code>,比如：</p>
+<table>
+<thead>
+<tr>
+<th>View</th>
+<th>Name</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>TextView</td>
+<td>usernameView</td>
+</tr>
+<tr>
+<td>Button</td>
+<td>acceptLoginView</td>
+</tr>
+<tr>
+<td>ImageView</td>
+<td>profileAvatarView</td>
+</tr>
+<tr>
+<td>RelativeLayout</td>
+<td>profileLayout</td>
+</tr>
+</tbody></table>
+<p>这样我们可以轻松地确认属性属于谁。例如，有一个字段中命名为<strong>用户</strong>，他是一个非常模糊的名称。给它的命名为usernameView，userAvatarView或userProfieLayout有助于弄清楚属性属于谁。</p>
+<p>在以前通常使用view的类型作为结尾（acceptLoginButton），但当views发生改变时，通常会忘记回到java类中去修改属性名称。</p>
+<h3 id="2-2-2-避免与容器类型相同"><a href="#2-2-2-避免与容器类型相同" class="headerlink" title="2.2.2 避免与容器类型相同"></a>2.2.2 避免与容器类型相同</h3><p>当创建一个集合变量时，我们命名应该避免使用容器类型。比如，我们有一个包含用户列表ArrayList</p>
+<p>应该这样命名：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">List&lt;String&gt; userIds = <span class="keyword">new</span> ArrayList&lt;&gt;();</span></pre></td></tr></table></figure>
+
+<p>而不应该：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">List&lt;String&gt; userIdList = <span class="keyword">new</span> ArrayList&lt;&gt;();</span></pre></td></tr></table></figure>
+
+<p>当我们更改容器时，我们通常会忘记更改名称，就像view的命名，他是不必要的。正确的名称包含他的属性信息就足够了。</p>
+<h3 id="2-2-3-避免相似的名称"><a href="#2-2-3-避免相似的名称" class="headerlink" title="2.2.3 避免相似的名称"></a>2.2.3 避免相似的名称</h3><p>命名相似名称的变量、方法或类，会使其他开发人员阅读代码时产生混淆，比如：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">hasUserSelectedSingleProfilePreviously</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">hasUserSelectedSignedProfilePreviously</span></pre></td></tr></table></figure>
+
+<p>乍看之下可能很难找到他们之间的区别。一个更清晰的命名方式可以使开发人员更容易操作你的代码。</p>
+<h3 id="2-2-4-连续数字命名"><a href="#2-2-4-连续数字命名" class="headerlink" title="2.2.4 连续数字命名"></a>2.2.4 连续数字命名</h3><p>当Android Studio给我们自动创建代码时，他会使用连续数字命名，这是参数命名是可怕的！比如，这样不太好：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doSomething</span><span class="params">(String s1, String s2, String s3)</span></span></span></pre></td></tr></table></figure>
+
+<p>没有阅读注释很难了解这些参数，相反：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">doSomething</span><span class="params">(String userName, String userEmail, String userId)</span></span></span></pre></td></tr></table></figure>
+
+<p>这样就很容易理解，现在我们根据代码就能够清晰的了解参数的意义🙂</p>
+<h3 id="2-2-5-易识别的命名"><a href="#2-2-5-易识别的命名" class="headerlink" title="2.2.5 易识别的命名"></a>2.2.5 易识别的命名</h3><p>当命名属性、方法和类时应该：</p>
+<ul>
+<li><p>容易阅读：有效的命名能够阅读同时就能理解他表达的意思，减少去理解他的意义消耗的时间。</p>
+</li>
+<li><p>容易发音：容易朗读的命名，可以避免当你和他人对话时你试图发音一个命名的尴尬。</p>
+</li>
+<li><p>容易寻找：没有什么比试图在一个类中寻找一个被拼写错了（或严重糟糕）的方法或变量更糟糕了。如果我们试图找到<strong>搜索用户</strong>的方法，那么当搜索<code>search</code>时他就应该出现。</p>
+</li>
+<li><p>不要使用匈牙利表示法：匈牙利表示法违背上述提出的三点，所以绝对不能用！</p>
+</li>
+</ul>
+<h3 id="2-2-6-缩写的单词必须大写"><a href="#2-2-6-缩写的单词必须大写" class="headerlink" title="2.2.6 缩写的单词必须大写"></a>2.2.6 缩写的单词必须大写</h3><p>所有的包含缩写的类、变量名等都应该使用大写来处理。比如：</p>
+<table>
+<thead>
+<tr>
+<th>Good</th>
+<th>bad</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>setUserId</td>
+<td>setUserID</td>
+</tr>
+<tr>
+<td>String uri</td>
+<td>String URI</td>
+</tr>
+<tr>
+<td>int id</td>
+<td>int ID</td>
+</tr>
+<tr>
+<td>parseHtml</td>
+<td>parseHTML</td>
+</tr>
+<tr>
+<td>generateXmlFile</td>
+<td>generateXMLFile</td>
+</tr>
+</tbody></table>
+<h3 id="2-2-7-避免特殊整理变量申明"><a href="#2-2-7-避免特殊整理变量申明" class="headerlink" title="2.2.7 避免特殊整理变量申明"></a>2.2.7 避免特殊整理变量申明</h3><p>所有的变量申明不应该使用特殊方式来对齐。比如：</p>
+<p>正常的代码:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">int</span> userId = <span class="number">8</span>;</span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">int</span> count = <span class="number">0</span>;</span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="keyword">private</span> String username = <span class="string">"hitherejoe"</span>;</span></pre></td></tr></table></figure>
+
+<p>避免这样:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">private</span> String username = <span class="string">"hitherejoe"</span>;</span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">int</span> userId      = <span class="number">8</span>;</span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">int</span> count       = <span class="number">0</span>;</span></pre></td></tr></table></figure>
+
+<p>这种声明方式在阅读时可能难以理解空白的字符串。</p>
+<h3 id="2-2-8-缩进"><a href="#2-2-8-缩进" class="headerlink" title="2.2.8 缩进"></a>2.2.8 缩进</h3><p>对于代码块，缩进应该使用4个空格：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (userSignedIn) &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">    count = <span class="number">1</span>;</span></pre></td></tr><tr><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<p>而当包裹多行，缩进应该使用8个空格：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">String userAboutText =</span></pre></td></tr><tr><td class="code"><pre><span class="line">            <span class="string">"This is some text about the user and it is pretty long, can you see!"</span></span></pre></td></tr></table></figure>
+
+<h2 id="2-2-9-If-Statements"><a href="#2-2-9-If-Statements" class="headerlink" title="2.2.9 If-Statements"></a>2.2.9 If-Statements</h2><h3 id="2-2-9-1-大括号规范"><a href="#2-2-9-1-大括号规范" class="headerlink" title="2.2.9.1 大括号规范"></a>2.2.9.1 大括号规范</h3><p>大括号通常应该和他之前的代码同行，避免这样：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SomeClass</span></span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="class"></span>&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">someFunction</span><span class="params">()</span></span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="function">    </span>&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">        <span class="keyword">if</span> (isSomething)</span></pre></td></tr><tr><td class="code"><pre><span class="line">        &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">        &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line">        <span class="keyword">else</span> <span class="keyword">if</span> (!isSomethingElse)</span></pre></td></tr><tr><td class="code"><pre><span class="line">        &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">        &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line">        <span class="keyword">else</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">        &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">        &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<p>这样更好:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">SomeClass</span> </span>&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">someFunction</span><span class="params">()</span> </span>&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">        <span class="keyword">if</span> (isSomething) &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (!isSomethingElse) &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">        &#125; <span class="keyword">else</span> &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">        &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<p>特别增加一行完全没有必要，也不会更容易阅读代码。</p>
+<h3 id="2-2-9-2-单行if语句"><a href="#2-2-9-2-单行if语句" class="headerlink" title="2.2.9.2 单行if语句"></a>2.2.9.2 单行if语句</h3><p>有时使用单行if语句是可以的，比如：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (user == <span class="keyword">null</span>) <span class="keyword">return</span> <span class="keyword">false</span>;</span></pre></td></tr></table></figure>
+
+<p>然而，这只能是在简单的操作时，而这样的代码会更适合用大括号：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (user == <span class="keyword">null</span>) <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentExeption(<span class="string">"Oops, user object is required."</span>);</span></pre></td></tr></table></figure>
+
+<p>这样更好：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (user == <span class="keyword">null</span>) &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="keyword">throw</span> <span class="keyword">new</span> IllegalArgumentExeption(<span class="string">"Oops, user object is required."</span>);</span></pre></td></tr><tr><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<h3 id="2-2-9-3-条件嵌套"><a href="#2-2-9-3-条件嵌套" class="headerlink" title="2.2.9.3 条件嵌套"></a>2.2.9.3 条件嵌套</h3><p>可能的情况下，如果条件能合并，就应该避免复杂的嵌套。比如：</p>
+<p>Do:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (userSignedIn &amp;&amp; userId != <span class="keyword">null</span>) &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<p>Try to avoid:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (userSignedIn) &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="keyword">if</span> (userId != <span class="keyword">null</span>) &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<p>这使得语句更容易阅读并且嵌套除去了额外的行。</p>
+<h3 id="2-2-9-4-三元运算"><a href="#2-2-9-4-三元运算" class="headerlink" title="2.2.9.4 三元运算"></a>2.2.9.4 三元运算</h3><p>在合适的地方，使用三元运算简化操作，比如，这样更容易阅读：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">userStatusImage = signedIn ? R.drawable.ic_tick : R.drawable.ic_cross;</span></pre></td></tr></table></figure>
+
+<p>而且使用更少的行比下面这样：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (signedIn) &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">    userStatusImage = R.drawable.ic_tick;</span></pre></td></tr><tr><td class="code"><pre><span class="line">&#125; <span class="keyword">else</span> &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">    userStatusImage = R.drawable.ic_cross;</span></pre></td></tr><tr><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<h2 id="2-2-10-预定义的注释"><a href="#2-2-10-预定义的注释" class="headerlink" title="2.2.10 预定义的注释"></a>2.2.10 预定义的注释</h2><h3 id="2-2-10-1-注释实例"><a href="#2-2-10-1-注释实例" class="headerlink" title="2.2.10.1 注释实例"></a>2.2.10.1 注释实例</h3><p>Android代码风格：</p>
+<p><strong>@Override:</strong> @Override 注释必须是方法声明覆盖了实现的接口或父类的方法。举个例子，如果你使用@inheritdocs Javadoc标签，从一个类派生（不是实现），你也必须标注该方法@Overrides了父类的方法</p>
+<p><strong>@SuppressWarnings:</strong> @SuppressWarnings 注释应该只在它是不出现警告的情况下使用。如果警告你确定它不是问题，就应该使用@SuppressWarning。所以确保所有警告的代码没有问题。</p>
+<p>注释尽可能多。比如，当你一个属性可能是空时可以用@Nullable注释，例子：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Nullable</span> TextView userNameText;</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">getName</span><span class="params">(@Nullable String name)</span> </span>&#123; &#125;</span></pre></td></tr></table></figure>
+
+<h3 id="2-2-10-2-注释风格"><a href="#2-2-10-2-注释风格" class="headerlink" title="2.2.10.2 注释风格"></a>2.2.10.2 注释风格</h3><p>所应用方法或类的注释应该在声明中定义，每个注释单独一行：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Annotation</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="meta">@AnotherAnnotation</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SomeClass</span> </span>&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">  <span class="meta">@SomeAnotation</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">  <span class="function"><span class="keyword">public</span> String <span class="title">getMeAString</span><span class="params">()</span> </span>&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">  &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<p>当给属性添加注释时，应该确保注释在同一行上且有多余空间。比如：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Bind</span>(R.id.layout_coordinator) CoordinatorLayout coordinatorLayout;</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="meta">@Inject</span> MainPresenter mainPresenter;</span></pre></td></tr></table></figure>
+
+<p>我们这样做是因为它使语句更易于阅读。例如，<code>@Inject SomeComponent mSomeName</code>意味着这个变量代表此组件</p>
+<h3 id="2-2-11-限制变量的作用域"><a href="#2-2-11-限制变量的作用域" class="headerlink" title="2.2.11 限制变量的作用域"></a>2.2.11 限制变量的作用域</h3><p>局部变量的范围应保持在最低限度（Effective Java Item 29）。通过这样做，增加代码的可读性和可维护性，减少出错的可能性。每个变量都应该在封闭在所用的代码块中，外部不可以访问。</p>
+<p>局部变量应当在其第一次使用时声明，每个局部变量申明时都要初始化。如果你没有足够的信息来初始化变量，你应该推迟申明变量，直到你要使用他。– Android代码风格</p>
+<h3 id="2-2-12-未使用的元素"><a href="#2-2-12-未使用的元素" class="headerlink" title="2.2.12 未使用的元素"></a>2.2.12 未使用的元素</h3><p>所有未使用的<strong>属性</strong> 、<strong>导入（imports）</strong> 、<strong>方法</strong> 和<strong>类</strong>应该从代码中删除，除非后面注释有它有任何具体的理由。</p>
+<h3 id="2-2-13-导入顺序"><a href="#2-2-13-导入顺序" class="headerlink" title="2.2.13 导入顺序"></a>2.2.13 导入顺序</h3><p>使用Android Studio时，导入会自动排序。而其他情况时也许不会自动排序，这时我们应该手动排序根据：</p>
+<ol>
+<li>Android库的导入</li>
+<li>第三方库的导入</li>
+<li>J2EE和J2SE的导入</li>
+<li>当前项目文件中的导入</li>
+</ol>
+<p><strong>注意：</strong></p>
+<ul>
+<li><p>导入应该按照字母顺序排列，大写字母应在小写之前（比如Z在a前）。</p>
+</li>
+<li><p>每种分组之间应该用空行隔开，(android, com, JUnit, net, org, java, javax)</p>
+</li>
+</ul>
+<h3 id="2-2-14-日志（Logging）"><a href="#2-2-14-日志（Logging）" class="headerlink" title="2.2.14 日志（Logging）"></a>2.2.14 日志（Logging）</h3><p>日志应该记录在开发时有用的错误信息或其他信息。</p>
+<table>
+<thead>
+<tr>
+<th>Log</th>
+<th>Reason</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Log.v(String tag, String message)</td>
+<td>verbose</td>
+</tr>
+<tr>
+<td>Log.d(String tag, String message)</td>
+<td>debug</td>
+</tr>
+<tr>
+<td>Log.i(String tag, String message)</td>
+<td>information</td>
+</tr>
+<tr>
+<td>Log.w(String tag, String message)</td>
+<td>warning</td>
+</tr>
+<tr>
+<td>Log.e(String tag, String message)</td>
+<td>error</td>
+</tr>
+</tbody></table>
+<p>我们可以在类开始位置设置<code>static final</code>的<code>TAG</code>属性让<code>log</code>使用。例子：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String TAG = MyActivity<span class="class">.<span class="keyword">class</span>.<span class="title">getName</span>()</span>;</span></pre></td></tr></table></figure>
+
+<p>在发布的版本中不应该记录<code>verbose</code>和<code>debug</code>级别的日志信息。其他级别的<code>information</code> <code>warning</code> <code>error</code>日志信息还是应该继续记录。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> (BuildConfig.DEBUG) &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">    Log.d(TAG, <span class="string">"Here's a log message"</span>);</span></pre></td></tr><tr><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<p><strong>注意:</strong> Timber在使用时是优于Log方法的。他为我们处理TAG，不是我们去设定TAG。</p>
+<h3 id="2-2-15-属性的排序"><a href="#2-2-15-属性的排序" class="headerlink" title="2.2.15 属性的排序"></a>2.2.15 属性的排序</h3><p>在类文件的顶部声明的任何属性应该按以下顺序进行排序：</p>
+<ol>
+<li>枚举类型（Enums）</li>
+<li>常量</li>
+<li>依赖注入</li>
+<li>注解式绑定控件</li>
+<li>私有全局变量</li>
+<li>公共全局变量</li>
+</ol>
+<p>For example:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">enum</span> &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">    ENUM_ONE, ENUM_TWO</span></pre></td></tr><tr><td class="code"><pre><span class="line">&#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> String KEY_NAME = <span class="string">"KEY_NAME"</span>;</span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> COUNT_USER = <span class="number">0</span>;</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="meta">@Inject</span> SomeAdapter someAdapter;</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="meta">@BindView</span>(R.id.text_name) TextView nameText;</span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="meta">@BindView</span>(R.id.image_photo) ImageView photoImage;</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">int</span> userCount;</span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="keyword">private</span> String errorMessage;</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">int</span> someCount;</span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> String someString;</span></pre></td></tr></table></figure>
+
+<p>使用该排序习惯有助于字段声明进行分组，从而方便属性的定位和可读性。</p>
+<h3 id="2-2-16-类成员排序"><a href="#2-2-16-类成员排序" class="headerlink" title="2.2.16 类成员排序"></a>2.2.16 类成员排序</h3><p>为了改善代码可读性，按一定逻辑的对类成员进行排序是非常重要的。应该按以下规则来排序：</p>
+<ol>
+<li>常量</li>
+<li>属性</li>
+<li>构造函数</li>
+<li>覆盖的方法和回调方法（私有或公共的）</li>
+<li>公共方法</li>
+<li>私有方法</li>
+<li>内部类或内部接口</li>
+</ol>
+<p>实例:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MainActivity</span> <span class="keyword">extends</span> <span class="title">Activity</span> </span>&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> count;</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="title">newInstance</span><span class="params">()</span> </span>&#123; &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="meta">@Override</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">()</span> </span>&#123; &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">setUsername</span><span class="params">()</span> </span>&#123; &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">setupUsername</span><span class="params">()</span> </span>&#123; &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="keyword">static</span> <span class="class"><span class="keyword">class</span> <span class="title">AnInnerClass</span> </span>&#123; &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="class"><span class="keyword">interface</span> <span class="title">SomeInterface</span> </span>&#123; &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<p>所有的生命周期方法应该按照安卓框架类定义的组件的生命周期来排序，比如：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MainActivity</span> <span class="keyword">extends</span> <span class="title">Activity</span> </span>&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="comment">// Field and constructors</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="meta">@Override</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onCreate</span><span class="params">()</span> </span>&#123; &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="meta">@Override</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onStart</span><span class="params">()</span> </span>&#123; &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="meta">@Override</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onResume</span><span class="params">()</span> </span>&#123; &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="meta">@Override</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onPause</span><span class="params">()</span> </span>&#123; &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="meta">@Override</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onStop</span><span class="params">()</span> </span>&#123; &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="meta">@Override</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onRestart</span><span class="params">()</span> </span>&#123; &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="meta">@Override</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onDestroy</span><span class="params">()</span> </span>&#123; &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="comment">// public methods, private methods, inner classes and interfaces</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<h3 id="2-2-17-方法参数的排序"><a href="#2-2-17-方法参数的排序" class="headerlink" title="2.2.17 方法参数的排序"></a>2.2.17 方法参数的排序</h3><p>定义方法时，参数排序应该遵循：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> Post <span class="title">loadPost</span><span class="params">(Context context, <span class="keyword">int</span> postId)</span></span>;</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">loadPost</span><span class="params">(Context context, <span class="keyword">int</span> postId, Callback callback)</span></span>;</span></pre></td></tr></table></figure>
+
+<p><strong>Context</strong> 参数始终在第一位 <strong>Callback</strong> 参数始终在最尾。</p>
+<h3 id="2-2-18-字符串常量命名和值-（-）"><a href="#2-2-18-字符串常量命名和值-（-）" class="headerlink" title="2.2.18 字符串常量命名和值 （*****）"></a>2.2.18 字符串常量命名和值 （*****）</h3><p>当使用字符串常量，它们应该被声明为final的静态和使用如下约定：</p>
+<p>[Strings table]</p>
+<p><strong>注意</strong> 翻译不懂?</p>
+<h3 id="2-2-19-枚举（Enums）-（-）"><a href="#2-2-19-枚举（Enums）-（-）" class="headerlink" title="2.2.19 枚举（Enums） （*****）"></a>2.2.19 枚举（Enums） （*****）</h3><p>需要时才使用枚举，如果在其他方法需要，那么实现的方式不应该用枚举。</p>
+<p>不应该这样使用：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">enum</span> SomeEnum &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">    ONE, TWO, THREE</span></pre></td></tr><tr><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<p>这样更好：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> VALUE_ONE = <span class="number">1</span>;</span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> VALUE_TWO = <span class="number">2</span>;</span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">int</span> VALUE_THREE = <span class="number">3</span>;</span></pre></td></tr></table></figure>
+
+<h3 id="2-2-20-Fragments和Activities的参数-（-）"><a href="#2-2-20-Fragments和Activities的参数-（-）" class="headerlink" title="2.2.20 Fragments和Activities的参数 （*****）"></a>2.2.20 Fragments和Activities的参数 （*****）</h3><p>当我们使用Intent或Bundle传递数据时，键名和值必须规范。</p>
+<p><strong>Activity</strong></p>
+<p>传递数据到其他Activity必须使用KEY，定义遵循：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String KEY_NAME = <span class="string">"com.your.package.name.to.activity.KEY_NAME"</span>;</span></pre></td></tr></table></figure>
+
+<p><strong>Fragment</strong></p>
+<p>传递数据到其他Activity必须使用EXTRA，定义遵循：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> String EXTRA_NAME = <span class="string">"EXTRA_NAME"</span>;</span></pre></td></tr></table></figure>
+
+<p>当创建新的Fragment或Activity实例，向实例传递数据时，我们应该提供一个静态方法来获取新的实例，传递数据的方法参数。 例如：</p>
+<p><strong>Activity</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Intent <span class="title">getStartIntent</span><span class="params">(Context context, Post post)</span> </span>&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">    Intent intent = <span class="keyword">new</span> Intent(context, CurrentActivity<span class="class">.<span class="keyword">class</span>)</span>;</span></pre></td></tr><tr><td class="code"><pre><span class="line">    intent.putParcelableExtra(EXTRA_POST, post);</span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="keyword">return</span> intent;</span></pre></td></tr><tr><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<p><strong>Fragment</strong></p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> PostFragment <span class="title">newInstance</span><span class="params">(Post post)</span> </span>&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">    PostFragment fragment = <span class="keyword">new</span> PostFragment();</span></pre></td></tr><tr><td class="code"><pre><span class="line">    Bundle args = <span class="keyword">new</span> Bundle();</span></pre></td></tr><tr><td class="code"><pre><span class="line">    args.putParcelable(ARGUMENT_POST, post);</span></pre></td></tr><tr><td class="code"><pre><span class="line">    fragment.setArguments(args)</span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="keyword">return</span> fragment;</span></pre></td></tr><tr><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<h3 id="2-2-21-行长度限制"><a href="#2-2-21-行长度限制" class="headerlink" title="2.2.21 行长度限制"></a>2.2.21 行长度限制</h3><p>代码长度尽量不要超过100个字符，他使得更难阅读代码，为了这样我们应该遵循：</p>
+<ul>
+<li>数据提取到一个局部变量</li>
+<li>逻辑由外部方法实现</li>
+<li>有的代码可以换行分割成几行</li>
+</ul>
+<p><strong>注意:</strong> 对于注释和import语句不存在100字符的限制</p>
+<h3 id="2-2-21-1-换行技巧"><a href="#2-2-21-1-换行技巧" class="headerlink" title="2.2.21.1 换行技巧"></a>2.2.21.1 换行技巧</h3><p>对于太长的一行分割成几行的代码，我们应该保持代码的样式一致。</p>
+<p><strong>分割运算</strong></p>
+<p>有时使用运算符，导致这一行太长，我们应该分割这个运算符。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">int</span> count = countOne + countTwo - countThree + countFour * countFive - countSix</span></pre></td></tr><tr><td class="code"><pre><span class="line">        + countOnANewLineBecauseItsTooLong;</span></pre></td></tr></table></figure>
+
+<p>当然，你也可以这样分割：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">int count &#x3D;</span></pre></td></tr><tr><td class="code"><pre><span class="line">        countOne + countTwo - countThree + countFour * countFive + countSix;</span></pre></td></tr></table></figure>
+
+<p><strong>方法链</strong></p>
+<p>使用方法链时，尽量不要在一行使用。</p>
+<p>不要这样</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Picasso.with(context).load(<span class="string">"someUrl"</span>).into(imageView);</span></pre></td></tr></table></figure>
+
+<p>而该这样:</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">Picasso.with(context)</span></pre></td></tr><tr><td class="code"><pre><span class="line">        .load(<span class="string">"someUrl"</span>)</span></pre></td></tr><tr><td class="code"><pre><span class="line">        .into(imageView);</span></pre></td></tr></table></figure>
+
+<p><strong>太长的参数</strong></p>
+<p>在有的方法中包含许多的参数，我们应该在适当情况下换行。比如我们申明方法时有太多的参数时，我们在合适的参数后面换行：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">someMethod</span><span class="params">(Context context, String someLongStringName, String text,</span></span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="function"><span class="params">                            <span class="keyword">long</span> thisIsALong, String anotherString)</span> </span>&#123;               </span></pre></td></tr><tr><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<p>当调用方法时，我们应该每个参数都换行：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">someMethod(context,</span></pre></td></tr><tr><td class="code"><pre><span class="line">        <span class="string">"thisIsSomeLongTextItsQuiteLongIsntIt"</span>,</span></pre></td></tr><tr><td class="code"><pre><span class="line">        <span class="string">"someText"</span>,</span></pre></td></tr><tr><td class="code"><pre><span class="line">        <span class="number">01223892365463456</span>,</span></pre></td></tr><tr><td class="code"><pre><span class="line">        <span class="string">"thisIsSomeLongTextItsQuiteLongIsntIt"</span>);</span></pre></td></tr></table></figure>
+
+<h3 id="2-2-22-方法间隔"><a href="#2-2-22-方法间隔" class="headerlink" title="2.2.22 方法间隔"></a>2.2.22 方法间隔</h3><p>在方法之间只应该空一行。</p>
+<p>正确：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">getUserName</span><span class="params">()</span> </span>&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="comment">// Code</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">&#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setUserName</span><span class="params">(String name)</span> </span>&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="comment">// Code</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">&#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isUserSignedIn</span><span class="params">()</span> </span>&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="comment">// Code</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<p>错误示范：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">getUserName</span><span class="params">()</span> </span>&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="comment">// Code</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">&#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setUserName</span><span class="params">(String name)</span> </span>&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="comment">// Code</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">&#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isUserSignedIn</span><span class="params">()</span> </span>&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="comment">// Code</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<h2 id="2-2-23-注释"><a href="#2-2-23-注释" class="headerlink" title="2.2.23 注释"></a>2.2.23 注释</h2><h3 id="2-2-23-1-行内注释"><a href="#2-2-23-1-行内注释" class="headerlink" title="2.2.23.1 行内注释"></a>2.2.23.1 行内注释</h3><p>在必要时，内部注释被用来向读者提供这一段代码的意义，它只应在代码复杂难以理解的情况下使用。然而，在大多数情况下，代码应该被写的相当简单便于阅读而不需要注释</p>
+<p><strong>注意:</strong> 行内注释尽量保持不超过100字符</p>
+<h3 id="2-2-23-2-JavaDoc风格注释"><a href="#2-2-23-2-JavaDoc风格注释" class="headerlink" title="2.2.23.2 JavaDoc风格注释"></a>2.2.23.2 JavaDoc风格注释</h3><p>方法的应该命名为描述方法的功能。JavaDoc风格注释的内容，是使得更容易理解方法的功能，以及传递到方法的所有参数的作用。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment"> * Authenticates the user against the API given a User id.</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment"> * If successful, this returns a success result</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment"> *</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment"> * <span class="doctag">@param</span> userId The user id of the user that is to be authenticated.</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment"> */</span></span></pre></td></tr></table></figure>
+
+<h3 id="2-2-23-3-类注释"><a href="#2-2-23-3-类注释" class="headerlink" title="2.2.23.3 类注释"></a>2.2.23.3 类注释</h3><p>创建的类注释应该是有意义的、描述性的。在需要的地方使用@link，例如：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">  * RecyclerView adapter to display a list of &#123;<span class="doctag">@link</span> Post&#125;.</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">  * Currently used with &#123;<span class="doctag">@link</span> PostRecycler&#125; to show the list of Post items.</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">  */</span></span></pre></td></tr></table></figure>
+
+<p>关于作者注释，当有很多人使用和修改这个类时，这个注释并不能提供任何有用的信息。</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">  * Created By Joe 18/06/2016</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">  */</span></span></pre></td></tr></table></figure>
+
+<h2 id="2-2-24-分割代码"><a href="#2-2-24-分割代码" class="headerlink" title="2.2.24 分割代码"></a>2.2.24 分割代码</h2><h3 id="2-2-24-1-Java代码"><a href="#2-2-24-1-Java代码" class="headerlink" title="2.2.24.1 Java代码"></a>2.2.24.1 Java代码</h3><p>当使用注释分割代码时，注释应该遵循下面这样的方式：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">method</span><span class="params">()</span> </span>&#123; &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">someOtherMethod</span><span class="params">()</span> </span>&#123; &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">/********* Mvp Method Implementations  ********/</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">anotherMethod</span><span class="params">()</span> </span>&#123; &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">/********* Helper Methods  ********/</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">someMethod</span><span class="params">()</span> </span>&#123; &#125;</span></pre></td></tr></table></figure>
+
+<p>不要这样：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">method</span><span class="params">()</span> </span>&#123; &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">someOtherMethod</span><span class="params">()</span> </span>&#123; &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">// Mvp Method Implementations</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">anotherMethod</span><span class="params">()</span> </span>&#123; &#125;</span></pre></td></tr></table></figure>
+
+<p>这使得分割的方法比较容易在一个类来定位。</p>
+<h3 id="2-2-24-2-字符串文件"><a href="#2-2-24-2-字符串文件" class="headerlink" title="2.2.24.2 字符串文件"></a>2.2.24.2 字符串文件</h3><p>字符串资源在<code>string.xml</code>文件中定义，且按功能分割成组，比如：</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line">// User Profile Activity</span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">string</span> <span class="attr">name</span>=<span class="string">"button_save"</span>&gt;</span>Save<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">string</span> <span class="attr">name</span>=<span class="string">"button_cancel"</span>&gt;</span>Cancel<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">// Settings Activity</span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">string</span> <span class="attr">name</span>=<span class="string">"message_instructions"</span>&gt;</span>...<span class="tag">&lt;/<span class="name">string</span>&gt;</span></span></pre></td></tr></table></figure>
+
+<p>这不仅有助于保持字符串文件整齐，而且当需要改变内容时更容易找到字符串。</p>
+<h3 id="2-2-24-3-RxJava-chaining"><a href="#2-2-24-3-RxJava-chaining" class="headerlink" title="2.2.24.3 RxJava chaining"></a>2.2.24.3 RxJava chaining</h3><p>当Rx链式操作时，都应该在<code>.</code>之前换一行，比如：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">return</span> dataManager.getPost()</span></pre></td></tr><tr><td class="code"><pre><span class="line">            .concatMap(<span class="keyword">new</span> Func1&lt;Post, Observable&lt;? extends Post&gt;&gt;() &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">                <span class="meta">@Override</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">                 <span class="keyword">public</span> Observable&lt;? extends Post&gt; call(Post post) &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">                     <span class="keyword">return</span> mRetrofitService.getPost(post.id);</span></pre></td></tr><tr><td class="code"><pre><span class="line">                 &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line">            &#125;)</span></pre></td></tr><tr><td class="code"><pre><span class="line">            .retry(<span class="keyword">new</span> Func2&lt;Integer, Throwable, Boolean&gt;() &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">                 <span class="meta">@Override</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">                 <span class="function"><span class="keyword">public</span> Boolean <span class="title">call</span><span class="params">(Integer numRetries, Throwable throwable)</span> </span>&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">                     <span class="keyword">return</span> throwable <span class="keyword">instanceof</span> RetrofitError;</span></pre></td></tr><tr><td class="code"><pre><span class="line">                 &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line">            &#125;);</span></pre></td></tr></table></figure>
+
+<p>这使得更容易理解的链操作的流程。</p>
+<h2 id="2-2-25-Butterknife"><a href="#2-2-25-Butterknife" class="headerlink" title="2.2.25 Butterknife"></a>2.2.25 Butterknife</h2><h3 id="2-2-25-1-事件侦听"><a href="#2-2-25-1-事件侦听" class="headerlink" title="2.2.25.1 事件侦听"></a>2.2.25.1 事件侦听</h3><p>在需要时，使用Butterknife绑定监听器，比如单击事件的绑定就应该是：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">mSubmitButton.setOnClickListener(<span class="keyword">new</span> View.OnClickListener() &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onClick</span><span class="params">(View v)</span> </span>&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">        <span class="comment">// Some code here...</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">    &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line">  &#125;;</span></pre></td></tr></table></figure>
+
+<p>不是这样：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@OnClick</span>(R.id.button_submit)</span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">onSubmitButtonClick</span><span class="params">()</span> </span>&#123; &#125;</span></pre></td></tr></table></figure>
+
+<h1 id="2-3-XML样式规则"><a href="#2-3-XML样式规则" class="headerlink" title="2.3 XML样式规则"></a>2.3 XML样式规则</h1><h2 id="2-3-1-使用自己的关闭标签"><a href="#2-3-1-使用自己的关闭标签" class="headerlink" title="2.3.1 使用自己的关闭标签"></a>2.3.1 使用自己的关闭标签</h2><p>当在一个XML布局视图没有任何子标签时，应使用自结束标签。</p>
+<p>这样：</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">ImageView</span></span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="tag">    <span class="attr">android:id</span>=<span class="string">"@+id/image_user"</span></span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="tag">    <span class="attr">android:layout_width</span>=<span class="string">"90dp"</span></span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="tag">    <span class="attr">android:layout_height</span>=<span class="string">"90dp"</span> /&gt;</span></span></pre></td></tr></table></figure>
+
+<p>不要这样：</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">ImageView</span></span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="tag">    <span class="attr">android:id</span>=<span class="string">"@+id/image_user"</span></span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="tag">    <span class="attr">android:layout_width</span>=<span class="string">"90dp"</span></span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="tag">    <span class="attr">android:layout_height</span>=<span class="string">"90dp"</span>&gt;</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="tag">&lt;/<span class="name">ImageView</span>&gt;</span></span></pre></td></tr></table></figure>
+
+<h2 id="2-3-2-资源命名"><a href="#2-3-2-资源命名" class="headerlink" title="2.3.2 资源命名"></a>2.3.2 资源命名</h2><p>所有的资源名称和ID都应该使用小写和下划线，示例：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">text_username, activity_main, fragment_user, error_message_network_connection</span></pre></td></tr></table></figure>
+
+<p>这样可以保持一致， 当想更改布局文件时更容易找到这个文件。</p>
+<h3 id="2-3-2-1-ID命名"><a href="#2-3-2-1-ID命名" class="headerlink" title="2.3.2.1 ID命名"></a>2.3.2.1 ID命名</h3><p>所有的ID命名都应该使用他的元素作为前缀。</p>
+<table>
+<thead>
+<tr>
+<th>Element</th>
+<th>Prefix</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>ImageView</td>
+<td>image_</td>
+</tr>
+<tr>
+<td>Fragment</td>
+<td>fragment_</td>
+</tr>
+<tr>
+<td>RelativeLayout</td>
+<td>layout_</td>
+</tr>
+<tr>
+<td>Button</td>
+<td>button_</td>
+</tr>
+<tr>
+<td>TextView</td>
+<td>text_</td>
+</tr>
+<tr>
+<td>View</td>
+<td>view_</td>
+</tr>
+</tbody></table>
+<p>比如:</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">TextView</span></span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="tag">    <span class="attr">android:id</span>=<span class="string">"@+id/text_username"</span></span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="tag">    <span class="attr">android:layout_width</span>=<span class="string">"wrap_content"</span></span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="tag">    <span class="attr">android:layout_height</span>=<span class="string">"wrap_content"</span> /&gt;</span></span></pre></td></tr></table></figure>
+
+<p>特殊View只出现一次在布局文件中，可以直接给他定义为元素名称。比如<code>toolbar</code>。</p>
+<h3 id="2-3-2-2-字符串"><a href="#2-3-2-2-字符串" class="headerlink" title="2.3.2.2 字符串"></a>2.3.2.2 字符串</h3><p>所有的字符串名称应该与他们正被应用程序引用的一部分作为前缀开头。比如：</p>
+<table>
+<thead>
+<tr>
+<th>Screen</th>
+<th>String</th>
+<th>Resource Name</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Registration Fragment</td>
+<td>“Register now”</td>
+<td>registration_register_now</td>
+</tr>
+<tr>
+<td>Sign Up Activity</td>
+<td>“Cancel”</td>
+<td>sign_up_cancel</td>
+</tr>
+<tr>
+<td>Rate App Dialog</td>
+<td>“No thanks”</td>
+<td>rate_app_no_thanks</td>
+</tr>
+</tbody></table>
+<p>如果这是不被引用的，我们可以使用下面的规则：</p>
+<table>
+<thead>
+<tr>
+<th>Prefix</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>error_</td>
+<td>Used for error messages</td>
+</tr>
+<tr>
+<td>title_</td>
+<td>Used for dialog titles</td>
+</tr>
+<tr>
+<td>action_</td>
+<td>Used for option menu actions</td>
+</tr>
+<tr>
+<td>msg_</td>
+<td>Used for generic message such as in a dialog</td>
+</tr>
+<tr>
+<td>label_</td>
+<td>Used for activity labels</td>
+</tr>
+</tbody></table>
+<p>字符串资源有两个重点：</p>
+<ul>
+<li><p>字符串资源不应该在整个屏幕上重复使用。当想改变屏幕中一个字符串时会出现额外问题。每处使用单独的字符串定义解决未来可能会出现的问题</p>
+</li>
+<li><p>字符串<strong>通常</strong>在<code>strings.xml</code>中定义，不再类文件中直接使用字符串。</p>
+</li>
+</ul>
+<h3 id="2-3-2-3-样式和主题"><a href="#2-3-2-3-样式和主题" class="headerlink" title="2.3.2.3 样式和主题"></a>2.3.2.3 样式和主题</h3><p>当定义样式和主题时，通常使用驼峰命名法来命名。比如：</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">AppTheme.DarkBackground.NoActionBar</span></pre></td></tr><tr><td class="code"><pre><span class="line">AppTheme.LightBackground.TransparentStatusBar</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">ProfileButtonStyle</span></pre></td></tr><tr><td class="code"><pre><span class="line">TitleTextStyle</span></pre></td></tr></table></figure>
+
+<h2 id="2-3-3-属性排序"><a href="#2-3-3-属性排序" class="headerlink" title="2.3.3 属性排序"></a>2.3.3 属性排序</h2><p>属性的排序不仅要求整齐而且还要在布局文件中能快速定位属性。主要规则：</p>
+<ol>
+<li>View Id</li>
+<li>Style</li>
+<li>Layout width and layout height</li>
+<li>Other <code>layout_</code> attributes, sorted alphabetically</li>
+<li>Remaining attributes, sorted alphabetically</li>
+</ol>
+<p>For example:</p>
+<figure class="highlight xml"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">Button</span></span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="tag">        <span class="attr">android:id</span>=<span class="string">"@id/button_accept"</span></span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="tag">        <span class="attr">style</span>=<span class="string">"@style/ButtonStyle"</span></span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="tag">        <span class="attr">android:layout_width</span>=<span class="string">"wrap_content"</span></span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="tag">        <span class="attr">android:layout_height</span>=<span class="string">"wrap_content"</span></span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="tag">        <span class="attr">android:layout_alignParentBottom</span>=<span class="string">"true"</span></span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="tag">        <span class="attr">android:layout_alignParentStart</span>=<span class="string">"true"</span></span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="tag">        <span class="attr">android:padding</span>=<span class="string">"16dp"</span></span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="tag">        <span class="attr">android:text</span>=<span class="string">"@string/button_skip_sign_in"</span></span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="tag">        <span class="attr">android:textColor</span>=<span class="string">"@color/bluish_gray"</span> /&gt;</span></span></pre></td></tr></table></figure>
+
+<p><strong>注意：</strong> 此格式可以通过在Android Studio中格式功能进行格式化 - <code>cmd + shift + L</code></p>
+<p>当想更改布局文件属性时，更容易通过XML浏览找到属性.</p>
+<h1 id="2-4-测试样式规则"><a href="#2-4-测试样式规则" class="headerlink" title="2.4 测试样式规则"></a>2.4 测试样式规则</h1><h2 id="2-4-1-单元测试"><a href="#2-4-1-单元测试" class="headerlink" title="2.4.1 单元测试"></a>2.4.1 单元测试</h2><p>任何单元测试类名应该和测试目标类名匹配，结尾加上Test后缀。示例：</p>
+<table>
+<thead>
+<tr>
+<th>Class</th>
+<th>Test Class</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>DataManager</td>
+<td>DataManagerTest</td>
+</tr>
+<tr>
+<td>UserProfilePresenter</td>
+<td>UserProfilePresenterTest</td>
+</tr>
+<tr>
+<td>PreferencesHelper</td>
+<td>PreferencesHelperTest</td>
+</tr>
+</tbody></table>
+<p>所有的测试方法都应该使用<code>@Test</code>注释，方法命名应该遵循这个示例：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">methodNamePreconditionExpectedResult</span><span class="params">()</span> </span>&#123; &#125;</span></pre></td></tr></table></figure>
+
+<p>根据示例，我们想检查signUp()方法在无效的email地址时的效果，这个测试方法应该是：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="meta">@Test</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">signUpWithInvalidEmailFails</span><span class="params">()</span> </span>&#123; &#125;</span></pre></td></tr></table></figure>
+
+<p>测试应该只测试方法名赋予的测试，如果想添加额外的测试，应该创建新的单元测试。</p>
+<p>如果我们当前测试类包含许多不同的方法，那么这个测试类应该分割成多个测试类。这有助于保持测试更易于维护，更容易定位。比如，一个DatabaseHelper类应该分成多个测试类：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">DatabaseHelperUserTest</span></pre></td></tr><tr><td class="code"><pre><span class="line">DatabaseHelperPostsTest</span></pre></td></tr><tr><td class="code"><pre><span class="line">DatabaseHelperDraftsTest</span></pre></td></tr></table></figure>
+
+<h2 id="2-4-2-Espresso测试"><a href="#2-4-2-Espresso测试" class="headerlink" title="2.4.2 Espresso测试"></a>2.4.2 Espresso测试</h2><p>每个Espresso测试类一般针对一个Activity，所以它的名称应与目标Activity的相同，再接着测试。 例如：</p>
+<table>
+<thead>
+<tr>
+<th>Class</th>
+<th>Test Class</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>MainActivity</td>
+<td>MainActivityTest</td>
+</tr>
+<tr>
+<td>ProfileActivity</td>
+<td>ProfileActivityTest</td>
+</tr>
+<tr>
+<td>DraftsActivity</td>
+<td>DraftsActivityTest</td>
+</tr>
+</tbody></table>
+<p>当用Espresso API时，为了增加可读性链式方法每个方法都应该单独一行。示例：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line">onView(withId(R.id.text_title))</span></pre></td></tr><tr><td class="code"><pre><span class="line">        .perform(scrollTo())</span></pre></td></tr><tr><td class="code"><pre><span class="line">        .check(matches(isDisplayed()))</span></pre></td></tr></table></figure>
+
+<p>这种风格不仅帮助我们坚持每行少于100个字符，而且也很容易地读取事件发生在那个Espresso测试链上。</p>
+</div></article></div></main><footer><div class="paginator"><a href="/Android%20Project%20Guidelines/1.Project%20Guidelines/" class="prev">上一篇</a><a href="/Android%20Project%20Guidelines/3.Gradle%20Style/" class="next">下一篇</a></div><div id="disqus_thread"></div><script>var disqus_shortname = 'maohhgg';
+var disqus_identifier = 'Android Project Guidelines/2.Code Guidelines/';
+var disqus_title = '代码规范（Android指南二）';
+var disqus_url = 'http://maohhgg.github.io/Android Project Guidelines/2.Code Guidelines/';
+(function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();</script><script id="dsq-count-scr" src="//maohhgg.disqus.com/count.js" async></script><div class="copyright"><p>© 2015 - 2019 <a href="http://maohhgg.github.io">maohhgg</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/maohhgg/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;e=o.createElement(i);r=o.getElementsByTagName(i)[0];e.src='//www.google-analytics.com/analytics.js';r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));ga('create',"UA-110078780-1",'auto');ga('send','pageview');</script></body></html>

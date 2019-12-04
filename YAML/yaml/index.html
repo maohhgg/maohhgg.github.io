@@ -1,0 +1,152 @@
+<!DOCTYPE html><html lang="zh-cn"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> YAML语言 · maohhgg</title><meta name="description" content="YAML语言 - maohhgg"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.ico"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="http://maohhgg.github.io/atom.xml" title="maohhgg"><meta name="generator" content="Hexo 4.0.0"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="/tags/" target="_self" class="nav-list-link">TAG</a></li><li class="nav-list-item"><a href="https://github.com/maohhgg" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">YAML语言</h1><div class="post-tags"><a href="/tags/YAML/">#YAML</a><a href="/tags/%E6%A0%87%E8%AE%B0%E8%AF%AD%E8%A8%80/">#标记语言</a></div><div class="post-info">2016年10月29日</div><div class="post-content"><p>编程中经常会写配置文件，本人比较喜欢使用 JSON，在我以往使用的语言都对 JSON 有良好的支持。 当我使用 <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a> 来构建这个博客时， 配置 Hexo 时发现她使用了 YAML 来编写配置文件。google之，发现 YAML 包含了 JSON 的优点（部分吧），还能存储复杂的数据结构。</p>
+<p>为什么没提 ini xml 来维护配置文件。编程从PHP开始，对xml支持不友好，解析xml比json麻烦得多。ini使用较少。</p>
+<a id="more"></a>
+<h1 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h1><p>YAML ： YAML Ain’t Markup Language YAML 是专门用来写配置文件的语言。</p>
+<h2 id="语法规则"><a href="#语法规则" class="headerlink" title="语法规则"></a>语法规则</h2><ul>
+<li><p>大小写敏感</p>
+</li>
+<li><p>缩进：</p>
+<ol>
+<li>使用缩进表示层级关系</li>
+<li>缩进时不允许使用Tab键，只允许使用空格。</li>
+<li>缩进的空格数目不重要，只要相同层级的元素左侧对齐即可</li>
+</ol>
+</li>
+<li><p>注释：</p>
+<p><code>#</code>表示注释，从这个字符一直到行尾，都会被解析器忽略。</p>
+</li>
+</ul>
+<h1 id="支持的数据结构"><a href="#支持的数据结构" class="headerlink" title="支持的数据结构"></a>支持的数据结构</h1><h2 id="对象"><a href="#对象" class="headerlink" title="对象"></a>对象</h2><p>键值对的集合，又称为映射（mapping） / 哈希（hashes） / 字典（dictionary） 使用使用冒号结构表示：</p>
+<figure class="highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="attr">animal:</span> <span class="string">cat</span></span></pre></td></tr></table></figure>
+
+<p>JavaScript表示：</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line">&#123; <span class="attr">animal</span>: <span class="string">'cat'</span> &#125;</span></pre></td></tr></table></figure>
+
+<p>Yaml 也允许将所有键值对写成一个行内对象。</p>
+<figure class="highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="attr">hash:</span> <span class="string">&#123;</span> <span class="attr">name:</span> <span class="string">Steve,</span> <span class="attr">foo:</span> <span class="string">bar</span> <span class="string">&#125;</span></span></pre></td></tr></table></figure>
+
+<p>JavaScript：</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line">&#123; <span class="attr">hash</span>: &#123; <span class="attr">name</span>: <span class="string">'Steve'</span>, <span class="attr">foo</span>: <span class="string">'bar'</span> &#125; &#125;</span></pre></td></tr></table></figure>
+
+<h2 id="数组"><a href="#数组" class="headerlink" title="数组"></a>数组</h2><p>数组：一组按次序排列的值，又称为序列（sequence） / 列表（list） 一组连词线开头的行，构成一个数组。</p>
+<figure class="highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="bullet">-</span> <span class="string">Cat</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="bullet">-</span> <span class="string">Dog</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="bullet">-</span> <span class="string">Goldfish</span></span></pre></td></tr></table></figure>
+
+<p>JavaScript :</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line">[ <span class="string">'Cat'</span>, <span class="string">'Dog'</span>, <span class="string">'Goldfish'</span> ]</span></pre></td></tr></table></figure>
+
+<p>数据结构的子成员是一个数组，则可以在该项下面缩进一个空格。</p>
+<figure class="highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="bullet">-</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"> <span class="bullet">-</span> <span class="string">Cat</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"> <span class="bullet">-</span> <span class="string">Dog</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"> <span class="bullet">-</span> <span class="string">Goldfish</span></span></pre></td></tr></table></figure>
+
+<p>JavaScript :</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line">[ [ <span class="string">'Cat'</span>, <span class="string">'Dog'</span>, <span class="string">'Goldfish'</span> ] ]</span></pre></td></tr></table></figure>
+
+<p>当然数组也可以采用行内表示法。</p>
+<figure class="highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="attr">animal :</span> <span class="string">[cat,</span> <span class="string">dog,</span> <span class="string">Goldfish]</span></span></pre></td></tr></table></figure>
+
+<p>JavaScript :</p>
+<figure class="highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="string">&#123;</span> <span class="attr">animal:</span> <span class="string">[</span> <span class="string">'Cat'</span><span class="string">,</span> <span class="string">'Dog'</span><span class="string">,</span> <span class="string">'Goldfish'</span> <span class="string">]</span> <span class="string">&#125;</span></span></pre></td></tr></table></figure>
+
+<h2 id="复合结构"><a href="#复合结构" class="headerlink" title="复合结构"></a>复合结构</h2><p>对象和数组可以结合使用形成复合结构。</p>
+<figure class="highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="attr">languages:</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"> <span class="bullet">-</span> <span class="string">Ruby</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"> <span class="bullet">-</span> <span class="string">Perl</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"> <span class="bullet">-</span> <span class="string">Python</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="attr">websites:</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"> <span class="attr">YAML:</span> <span class="string">yaml.org</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"> <span class="attr">Ruby:</span> <span class="string">ruby-lang.org</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"> <span class="attr">Python:</span> <span class="string">python.org</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"> <span class="attr">Perl:</span> <span class="string">use.perl.org</span></span></pre></td></tr></table></figure>
+
+<p>JavaScript:</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line">&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">    languages: [ <span class="string">'Ruby'</span>, <span class="string">'Perl'</span>, <span class="string">'Python'</span> ],</span></pre></td></tr><tr><td class="code"><pre><span class="line">    websites: &#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">        YAML: <span class="string">'yaml.org'</span>,</span></pre></td></tr><tr><td class="code"><pre><span class="line">        Ruby: <span class="string">'ruby-lang.org'</span>,</span></pre></td></tr><tr><td class="code"><pre><span class="line">        Python: <span class="string">'python.org'</span>,</span></pre></td></tr><tr><td class="code"><pre><span class="line">        Perl: <span class="string">'use.perl.org'</span> &#125;</span></pre></td></tr><tr><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<h2 id="配置纯量"><a href="#配置纯量" class="headerlink" title="配置纯量"></a>配置纯量</h2><p>纯量是最基本的、不可再分的值。</p>
+<h3 id="布尔值"><a href="#布尔值" class="headerlink" title="布尔值"></a>布尔值</h3><p>布尔值用true和false表示。</p>
+<figure class="highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="attr">isSet:</span> <span class="literal">true</span></span></pre></td></tr></table></figure>
+
+<h3 id="整数-amp-浮点数"><a href="#整数-amp-浮点数" class="headerlink" title="整数 &amp; 浮点数"></a>整数 &amp; 浮点数</h3><p>数值直接以字面量的形式表示</p>
+<ul>
+<li><p>整数</p>
+<figure class="highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="attr">number:</span> <span class="number">12</span></span></pre></td></tr></table></figure>
+</li>
+<li><p>浮点数</p>
+<figure class="highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="attr">number:</span> <span class="number">12.30</span></span></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<h3 id="NULL"><a href="#NULL" class="headerlink" title="NULL"></a>NULL</h3><p>NULL比较特殊，NULL使用 <code>~</code> 来表示</p>
+<figure class="highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="comment"># 注意区分 ~ 和 `</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="attr">isSet:</span> <span class="string">~</span></span></pre></td></tr></table></figure>
+
+<h3 id="时间"><a href="#时间" class="headerlink" title="时间"></a>时间</h3><p>时间采用 ISO8601 格式。</p>
+<figure class="highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="attr">iso8601:</span> <span class="number">2001</span><span class="number">-12</span><span class="string">-14t21:59:43.10-05:00</span></span></pre></td></tr></table></figure>
+
+<p>JavaScript</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line">&#123; <span class="attr">iso8601</span>: <span class="keyword">new</span> <span class="built_in">Date</span>(<span class="string">'2001-12-14t21:59:43.10-05:00'</span>) &#125;</span></pre></td></tr></table></figure>
+
+<h3 id="日期"><a href="#日期" class="headerlink" title="日期"></a>日期</h3><p>日期采用复合 iso8601 格式的年、月、日表示。</p>
+<figure class="highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="attr">date:</span> <span class="number">1976</span><span class="number">-07</span><span class="number">-31</span></span></pre></td></tr></table></figure>
+
+<p>JavaScript</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line">&#123; <span class="attr">date</span>: <span class="keyword">new</span> <span class="built_in">Date</span>(<span class="string">'1976-07-31'</span>) &#125;</span></pre></td></tr></table></figure>
+
+<h3 id="字符串"><a href="#字符串" class="headerlink" title="字符串"></a>字符串</h3><p>字符串默认不使用引号表示。</p>
+<figure class="highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="attr">str:</span> <span class="string">这是一行字符串</span></span></pre></td></tr></table></figure>
+
+<p>如果字符串之中包含空格或特殊字符，需要放在引号之中。</p>
+<figure class="highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="attr">str:</span> <span class="string">'内容： 字符串'</span></span></pre></td></tr></table></figure>
+
+<p>单引号和双引号都可以使用，双引号不会对特殊字符转义。</p>
+<figure class="highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="attr">s1:</span> <span class="string">'内容\n字符串'</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="attr">s2:</span> <span class="string">"内容\n字符串"</span></span></pre></td></tr></table></figure>
+
+<p>JavaScript</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line">&#123;</span></pre></td></tr><tr><td class="code"><pre><span class="line">    s1: <span class="string">'内容\\n字符串'</span>,</span></pre></td></tr><tr><td class="code"><pre><span class="line">    s2: <span class="string">'内容\n字符串'</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">&#125;</span></pre></td></tr></table></figure>
+
+<p>单引号之中如果还有单引号，必须连续使用两个单引号转义。</p>
+<figure class="highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="attr">str:</span> <span class="string">'labor'</span><span class="string">'s day'</span></span></pre></td></tr></table></figure>
+
+<p>JavaScript</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line">&#123; <span class="attr">str</span>: <span class="string">'labor\'s day'</span> &#125;</span></pre></td></tr></table></figure>
+
+<p>字符串可以写成多行，从第二行开始，必须有一个单空格缩进。换行符会被转为空格。</p>
+<figure class="highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="attr">str:</span> <span class="string">这是一段</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"> <span class="string">多行</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"> <span class="string">字符串</span></span></pre></td></tr></table></figure>
+
+<p>JavaScript</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line">&#123; <span class="attr">str</span>: <span class="string">'这是一段 多行 字符串'</span> &#125;</span></pre></td></tr></table></figure>
+
+<p>多行字符串可以使用|保留换行符，也可以使用&gt;折叠换行。</p>
+<figure class="highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="attr">this:</span> <span class="string">|</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">  <span class="string">Foo</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">  <span class="string">Bar</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="attr">that:</span> <span class="string">&gt;</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">  <span class="string">Foo</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">  <span class="string">Bar</span></span></pre></td></tr></table></figure>
+
+<p>JavaScript</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line">&#123; <span class="attr">this</span>: <span class="string">'Foo\nBar\n'</span>, <span class="attr">that</span>: <span class="string">'Foo Bar\n'</span> &#125;</span></pre></td></tr></table></figure>
+
+<p><code>+</code> 表示保留文字块末尾的换行，<code>-</code> 表示删除字符串末尾的换行。</p>
+<figure class="highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="attr">s1:</span> <span class="string">|</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">  <span class="string">Foo</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="attr">s2:</span> <span class="string">|+</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">  <span class="string">Foo</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="attr">s3:</span> <span class="string">|-</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">  <span class="string">Foo</span></span></pre></td></tr></table></figure>
+
+<p>JavaScript</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line">&#123; <span class="attr">s1</span>: <span class="string">'Foo\n'</span>, <span class="attr">s2</span>: <span class="string">'Foo\n\n\n'</span>, <span class="attr">s3</span>: <span class="string">'Foo'</span> &#125;</span></pre></td></tr></table></figure>
+
+<p>字符串之中可以插入 HTML 标记。</p>
+<figure class="highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="attr">message:</span> <span class="string">|</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">  <span class="string">&lt;p</span> <span class="string">style="color:</span> <span class="string">red"&gt;</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">    <span class="string">段落</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">  <span class="string">&lt;/p&gt;</span></span></pre></td></tr></table></figure>
+
+<p>JavaScript</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line">&#123; <span class="attr">message</span>: <span class="string">'\n&lt;p style="color: red"&gt;\n  段落\n&lt;/p&gt;\n'</span> &#125;</span></pre></td></tr></table></figure>
+
+<h3 id="类型转换"><a href="#类型转换" class="headerlink" title="类型转换"></a>类型转换</h3><p>YAML 允许使用两个感叹号，强制转换数据类型。</p>
+<figure class="highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="attr">e:</span> <span class="type">!!str</span> <span class="number">123</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="attr">f:</span> <span class="type">!!str</span> <span class="literal">true</span></span></pre></td></tr></table></figure>
+
+<p>JavaScript</p>
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line">&#123; <span class="attr">e</span>: <span class="string">'123'</span>, <span class="attr">f</span>: <span class="string">'true'</span> &#125;</span></pre></td></tr></table></figure>
+
+<h2 id="引用"><a href="#引用" class="headerlink" title="引用"></a>引用</h2><p>锚点 <code>&amp;</code>和别名 <code>*</code>，可以用来引用。</p>
+<figure class="highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="attr">defaults:</span> <span class="meta">&amp;defaults</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">  <span class="attr">adapter:</span>  <span class="string">postgres</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">  <span class="attr">host:</span>     <span class="string">localhost</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="attr">development:</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">  <span class="attr">database:</span> <span class="string">myapp_development</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">  <span class="string">&lt;&lt;:</span> <span class="meta">*defaults</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="attr">test:</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">  <span class="attr">database:</span> <span class="string">myapp_test</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">  <span class="string">&lt;&lt;:</span> <span class="meta">*defaults</span></span></pre></td></tr></table></figure>
+
+<p>等同于：</p>
+<figure class="highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="attr">defaults:</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">  <span class="attr">adapter:</span>  <span class="string">postgres</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">  <span class="attr">host:</span>     <span class="string">localhost</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="attr">development:</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">  <span class="attr">database:</span> <span class="string">myapp_development</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">  <span class="attr">adapter:</span>  <span class="string">postgres</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">  <span class="attr">host:</span>     <span class="string">localhost</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="attr">test:</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">  <span class="attr">database:</span> <span class="string">myapp_test</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">  <span class="attr">adapter:</span>  <span class="string">postgres</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">  <span class="attr">host:</span>     <span class="string">localhost</span></span></pre></td></tr></table></figure>
+
+<p><code>&amp;</code> 用来建立锚点（defaults），<code>&lt;&lt;</code> 表示合并到当前数据，<code>*</code> 用来引用锚点。</p>
+<p>其他例子：</p>
+<figure class="highlight yml"><table><tr><td class="code"><pre><span class="line"><span class="bullet">-</span> <span class="string">&amp;anchor</span> <span class="string">Steve</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="bullet">-</span> <span class="string">Clark</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="bullet">-</span> <span class="string">Brian</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="bullet">-</span> <span class="string">Oren</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="bullet">-</span> <span class="meta">*anchor</span></span></pre></td></tr></table></figure>
+
+<p>JavaScript</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">[ <span class="string">'Steve'</span>, <span class="string">'Clark'</span>, <span class="string">'Brian'</span>, <span class="string">'Oren'</span>, <span class="string">'Steve'</span> ]</span></pre></td></tr></table></figure>
+</div></article></div></main><footer><div class="paginator"><a href="/JavaScript/console/" class="prev">上一篇</a><a href="/Java/Reflect/" class="next">下一篇</a></div><div id="disqus_thread"></div><script>var disqus_shortname = 'maohhgg';
+var disqus_identifier = 'YAML/yaml/';
+var disqus_title = 'YAML语言';
+var disqus_url = 'http://maohhgg.github.io/YAML/yaml/';
+(function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();</script><script id="dsq-count-scr" src="//maohhgg.disqus.com/count.js" async></script><div class="copyright"><p>© 2015 - 2019 <a href="http://maohhgg.github.io">maohhgg</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/maohhgg/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;e=o.createElement(i);r=o.getElementsByTagName(i)[0];e.src='//www.google-analytics.com/analytics.js';r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));ga('create',"UA-110078780-1",'auto');ga('send','pageview');</script></body></html>

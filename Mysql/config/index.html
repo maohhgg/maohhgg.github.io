@@ -1,0 +1,66 @@
+<!DOCTYPE html><html lang="zh-cn"><head><meta charset="utf-8"><meta name="X-UA-Compatible" content="IE=edge"><title> MySQL · maohhgg</title><meta name="description" content="MySQL - maohhgg"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="icon" href="/favicon.ico"><link rel="stylesheet" href="/css/apollo.css"><link rel="search" type="application/opensearchdescription+xml" href="http://maohhgg.github.io/atom.xml" title="maohhgg"><meta name="generator" content="Hexo 4.0.0"></head><body><div class="wrap"><header><a href="/" class="logo-link"><img src="/favicon.png" alt="logo"></a><ul class="nav nav-list"><li class="nav-list-item"><a href="/" target="_self" class="nav-list-link">BLOG</a></li><li class="nav-list-item"><a href="/archives/" target="_self" class="nav-list-link">ARCHIVE</a></li><li class="nav-list-item"><a href="/tags/" target="_self" class="nav-list-link">TAG</a></li><li class="nav-list-item"><a href="https://github.com/maohhgg" target="_blank" class="nav-list-link">GITHUB</a></li><li class="nav-list-item"><a href="/atom.xml" target="_self" class="nav-list-link">RSS</a></li></ul></header><main class="container"><div class="post"><article class="post-block"><h1 class="post-title">MySQL</h1><div class="post-tags"><a href="/tags/MySQL/">#MySQL</a></div><div class="post-info">2018年3月8日</div><div class="post-content"><p>MySQL 5.7开放下载已经几年了，比 MySQL 5.6 快 3 倍，同时还提高了可用性，可管理性和安全性。并增加了一些重要的增强功能： </p>
+<ol>
+<li>性能和可扩展性：改进 InnoDB 的可扩展性和临时表的性能，从而实现更快的网络和大数据加载等操作。</li>
+<li>JSON支持：使用 MySQL 的 JSON 功能，你可以结合 NoSQL 的灵活和关系数据库的强大。</li>
+<li>改进复制 以提高可用性的性能。包括多源复制，多从线程增强，在线 GTIDs，和增强的半同步复制。 </li>
+<li>性能模式 提供更好的视角。我们增加了许多新的监控功能，以减少空间和过载，使用新的 SYS 模式显著提高易用性。</li>
+<li>安全: 我们贯彻“安全第一”的要求，许多 MySQL 5.7 新功能帮助用户保证他们数据库的安全。</li>
+<li>优化: 我们重写了大部分解析器，优化器和成本模型。这提高了可维护性，可扩展性和性能。</li>
+<li>GIS: MySQL 5.7 全新的功能，包括 InnoDB 空间索引，使用 Boost.Geometry，同时提高完整性和标准符合性。</li>
+</ol>
+<p>还有一点就是在MySQL 5.6中最大索引长度为767字节，使用utf8mb4编码时，最多只有191个字符。而PHP 的 Laravel 5.4以后默认使用utf8mb4编码。MySQL 5.7增加到了3072字节。</p>
+<a id="more"></a>
+
+<h4 id="MySQL-安装"><a href="#MySQL-安装" class="headerlink" title="MySQL 安装"></a>MySQL 安装</h4><h5 id="Ubuntu-server"><a href="#Ubuntu-server" class="headerlink" title="Ubuntu server"></a>Ubuntu server</h5><p>如果你使用的Ubuntu系列的服务器，截至现在2018年3月，Ubuntu 16.04已经提供了MySQL5.7版本。可直接安装。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo apt update</span></pre></td></tr><tr><td class="code"><pre><span class="line">sudo apt install mysql-server</span></pre></td></tr></table></figure>
+
+<h5 id="Debian-server"><a href="#Debian-server" class="headerlink" title="Debian server"></a>Debian server</h5><p>而到目前为止（2018年3月），Debian 9（stretch）只 APT提供了MySQL 5.5.9999 版本。安装需要自行去添加源或下载高版本源中的打包文件安装。<br>我使用的是去下载打包好的文件deb文件。自行下载对应平台的文件：</p>
+<ol>
+<li><a href="https://packages.debian.org/sid/mysql-server" target="_blank" rel="noopener">mysql-server</a></li>
+<li><a href="https://packages.debian.org/sid/mysql-server-core-5.7" target="_blank" rel="noopener">mysql-server-core-5.7</a></li>
+<li><a href="https://packages.debian.org/sid/mysql-common" target="_blank" rel="noopener">mysql-common</a></li>
+<li><a href="https://packages.debian.org/sid/mysql-client" target="_blank" rel="noopener">mysql-client</a></li>
+<li><a href="https://packages.debian.org/sid/mysql-client-core-5.7" target="_blank" rel="noopener">mysql-client-core-5.7</a></li>
+<li><a href="https://packages.debian.org/sid/libevent-core-2.1-6" target="_blank" rel="noopener">libevent-core-2.1-6</a></li>
+<li><a href="https://packages.debian.org/sid/libmecab2" target="_blank" rel="noopener">libmecab2</a></li>
+</ol>
+<blockquote>
+<p>注意： 这只符合但前（2018年3月），以后可能有更新，视以后具体版本而定</p>
+</blockquote>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">libevent-core-2.1-6_2.1.8-stable-4_armhf.deb</span></pre></td></tr><tr><td class="code"><pre><span class="line">libmecab2_0.996-5_armhf.deb</span></pre></td></tr><tr><td class="code"><pre><span class="line">mysql-client-5.7_5.7.21-1_armhf.deb</span></pre></td></tr><tr><td class="code"><pre><span class="line">mysql-client-core-5.7_5.7.21-1_armhf.deb</span></pre></td></tr><tr><td class="code"><pre><span class="line">mysql-common_5.8+1.0.4_all.deb</span></pre></td></tr><tr><td class="code"><pre><span class="line">mysql-server-5.7_5.7.21-1_armhf.deb</span></pre></td></tr><tr><td class="code"><pre><span class="line">mysql-server-core-5.7_5.7.21-1_armhf.deb</span></pre></td></tr></table></figure>
+
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo dpkg -i *.deb</span></pre></td></tr></table></figure>
+
+<h5 id="MySQL-配置"><a href="#MySQL-配置" class="headerlink" title="MySQL 配置"></a>MySQL 配置</h5><p>当使用deb文件安装完成后，没有常规的安装过程中的初始化密码的步骤。需要在启动MySQL服务后查找默认密码，或者重置密码。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo /etc/init.d/mysql start</span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment"># or</span></span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment">#sudo service mysql start</span></span></pre></td></tr></table></figure>
+
+<p>在网上中其他教程中，有说默认密码会在 <code>/var/log/mysqld.log</code> 日志中记录初始化的密码，不知是否是使用的Debian系列的关系，教程中的是使用CentOS或者RedHat，我的MySQL的日志文件只有 <code>/var/log/mysql/error.log</code> 。 并没有说的 <code>/var/log/mysqld.log</code> 文件。<br>如果你使用的 CentOS 或者 RedHat 可以尝试下在 <code>/var/log/mysqld.log</code> 查找下密码。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo grep <span class="string">'temporary password'</span> /var/<span class="built_in">log</span>/mysqld.log</span></pre></td></tr></table></figure>
+
+<p>因为没有<code>/var/log/mysqld.log</code>，我只能是重置密码，重置密码也有多种方式。</p>
+<ol>
+<li>运行 <code>mysql_secure_installation</code> 按提示来重置密码</li>
+<li>MySQL使用安全模式启动，安全模式下不需要密码，在登录MySQL更新密码。</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">sudo servcie mysql stop</span></pre></td></tr><tr><td class="code"><pre><span class="line">sudo mysqld_safe --skip-grant-tables --skip-networking &amp;</span></pre></td></tr></table></figure>
+<p>使用文件安装的MySQL这一步可能有提示 <code>/var/run/mysqld</code> 不存在，只需创建这个文件夹，并把所有者更改为mysql即可</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">mkdir -p /var/run/mysqld</span></pre></td></tr><tr><td class="code"><pre><span class="line">sudo mkdir -p /var/run/mysqld</span></pre></td></tr><tr><td class="code"><pre><span class="line">sudo chown mysql:mysql /var/run/mysqld</span></pre></td></tr></table></figure>
+
+<p>然后直接登录MySQL更新密码。</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">mysql -u root</span></pre></td></tr><tr><td class="code"><pre><span class="line"></span></pre></td></tr><tr><td class="code"><pre><span class="line">Type <span class="string">'help;'</span> or <span class="string">'\h'</span> <span class="keyword">for</span> <span class="built_in">help</span>. Type <span class="string">'\c'</span> to clear the current input statement.</span></pre></td></tr><tr><td class="code"><pre><span class="line">mysql&gt; FLUSH PRIVILEGES;</span></pre></td></tr><tr><td class="code"><pre><span class="line"><span class="comment"># 数据库重新加载授权表。</span></span></pre></td></tr><tr><td class="code"><pre><span class="line">mysql&gt; ALTER USER <span class="string">'root'</span>@<span class="string">'localhost'</span> IDENTIFIED BY <span class="string">'new_password'</span>;</span></pre></td></tr></table></figure>
+
+<p>完成后关闭安全模式的MySQL和启动MySQL服务器。</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">sudo cat &#x2F;var&#x2F;run&#x2F;mysqld&#x2F;mysqld.pid </span></pre></td></tr><tr><td class="code"><pre><span class="line">xxxxx</span></pre></td></tr><tr><td class="code"><pre><span class="line">sudo kill xxxxx</span></pre></td></tr><tr><td class="code"><pre><span class="line">sudo service mysql start</span></pre></td></tr></table></figure>
+
+<h5 id="MySQL-优化"><a href="#MySQL-优化" class="headerlink" title="MySQL 优化"></a>MySQL 优化</h5><p>在小内存的机器上安装上MySQL5.7，会出现占用内存过多的现象。<br>performance_schema 这个选项式分析用的,小内存机器可以关了，能省好多内存</p>
+<figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">[mysqld]</span></pre></td></tr><tr><td class="code"><pre><span class="line">performance_schema     &#x3D; 0</span></pre></td></tr><tr><td class="code"><pre><span class="line">tabel_definition_cache &#x3D; 400</span></pre></td></tr><tr><td class="code"><pre><span class="line">tabel_open_cache       &#x3D; 256</span></pre></td></tr></table></figure>
+<p><img src="/Mysql/config/htop.png" alt="htop.png"></p>
+</div></article></div></main><footer><div class="paginator"><a href="/SQL/decrypted_sqlite_databas/" class="prev">上一篇</a><a href="/Python/lxml-hole/" class="next">下一篇</a></div><div id="disqus_thread"></div><script>var disqus_shortname = 'maohhgg';
+var disqus_identifier = 'Mysql/config/';
+var disqus_title = 'MySQL';
+var disqus_url = 'http://maohhgg.github.io/Mysql/config/';
+(function() {
+    var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+    (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+})();</script><script id="dsq-count-scr" src="//maohhgg.disqus.com/count.js" async></script><div class="copyright"><p>© 2015 - 2019 <a href="http://maohhgg.github.io">maohhgg</a>, powered by <a href="https://hexo.io/" target="_blank">Hexo</a> and <a href="https://github.com/maohhgg/hexo-theme-apollo" target="_blank">hexo-theme-apollo</a>.</p></div></footer></div><script async src="//cdn.bootcss.com/mathjax/2.7.0/MathJax.js?config=TeX-MML-AM_CHTML" integrity="sha384-crwIf/BuaWM9rM65iM+dWFldgQ1Un8jWZMuh3puxb8TOY9+linwLoI7ZHZT+aekW" crossorigin="anonymous"></script><script>(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;e=o.createElement(i);r=o.getElementsByTagName(i)[0];e.src='//www.google-analytics.com/analytics.js';r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));ga('create',"UA-110078780-1",'auto');ga('send','pageview');</script></body></html>
